@@ -46,7 +46,6 @@ KCM.SimpleKCM {
     property alias cfg_fullAlbumCoverPadding: fullAlbumCoverPadding.value
     property alias cfg_fullViewContentPadding: fullViewContentPadding.value
     property alias cfg_fullViewContentPaddingBottom: fullViewContentPaddingBottom.value
-    property alias cfg_fullViewClickToRaisePlayer: fullViewClickToRaisePlayer.checked
     property alias cfg_hideCanBeRaisedTooltip: hideCanBeRaisedTooltip.checked
 
     Kirigami.FormLayout {
@@ -397,18 +396,6 @@ KCM.SimpleKCM {
             from: 0
             to: 50
             stepSize: 2
-        }
-
-        RowLayout {
-            CheckBox {
-                id: fullViewClickToRaisePlayer
-                text: i18n("Click album cover to bring player to the front")
-            }
-            Kirigami.ContextualHelpButton {
-                toolTipText: i18n(
-                    "Disable if raising the player window causes display artifacts (e.g. broken transparency) on your setup."
-                )
-            }
         }
 
         Kirigami.Separator {
