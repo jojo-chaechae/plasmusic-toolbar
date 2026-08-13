@@ -12,11 +12,6 @@ import Qt5Compat.GraphicalEffects
 Item {
     id: root
 
-    enum SongAndArtistTextPosition {
-        AboveProgressBar,
-        UnderProgressBar
-    }
-
     enum AlbumCoverAlignment {
         Top,
         Middle,
@@ -32,9 +27,12 @@ Item {
     // Manually control whether the text uses album-derived contrast colors when the tint is active
     readonly property bool useAlbumContrastText: albumCoverBackground || (albumCoverTintBackground && albumCoverTintUseContrastText)
     property bool thumbnailVisible: plasmoid.configuration.fullViewThumbnailVisible
+    property bool showPinButton: plasmoid.configuration.showPinButton
     property int albumCoverVerticalAlignment: plasmoid.configuration.fullAlbumCoverVerticalAlignment
     property int albumCoverPadding: plasmoid.configuration.fullAlbumCoverPadding
-    property bool showPinButton: plasmoid.configuration.showPinButton
+    // Horizontal padding for the content components (text, slider, volume, controls).
+    property int contentPadding: plasmoid.configuration.fullViewContentPadding
+    property int contentBottomPadding: plasmoid.configuration.fullViewContentPaddingBottom
     property bool progressBarVisible: plasmoid.configuration.fullViewProgressBarVisible
     property bool volumeControlVisible: plasmoid.configuration.fullViewVolumeControlVisible
     property bool shuffleVisible: plasmoid.configuration.fullViewShuffleVisible
@@ -43,7 +41,8 @@ Item {
     property bool playbackControlsFitWidth: plasmoid.configuration.fullViewPlaybackControlsFillWidth
     property bool songTextVisible: plasmoid.configuration.fullViewSongTextVisible
     property int songTextAlignment: plasmoid.configuration.fullViewSongTextAlignment
-    property bool songTextAboveProgressBar: plasmoid.configuration.fullViewSongTextPosition === Full.SongAndArtistTextPosition.AboveProgressBar
+    // Vertical order of the content rows (any permutation of: song, progress, volume, controls)
+    readonly property var contentOrder: plasmoid.configuration.fullViewVerticalOrder.split(",")
 
     // The Full View max and min width is driven by config values. The window can be resized within these bounds; thumbnail and text adapt.
     readonly property int configMinWidth: plasmoid.configuration.fullViewMinWidth
@@ -54,8 +53,10 @@ Item {
     property int albumCoverRadius: plasmoid.configuration.fullAlbumCoverRadius
 
     // Override min width if visible content (e.g. playback controls) needs more space
-    readonly property int contentMinWidth: row.visible ? row.implicitWidth + 40 : 0
+    readonly property int contentMinWidth: controlsMinWidth > 0 ? controlsMinWidth + 40 : 0
     readonly property int effectiveMinWidth: Math.min(Math.max(configMinWidth, contentMinWidth), maximumWidth)
+    // Kept in sync with the playback controls' natural width by the controls component
+    property int controlsMinWidth: 0
 
     // Stable (width-independent) preferred thumbnail height, referenced to the min width, so that
     // resizing the popup width doesn't drag the height along with it (the "aspect ratio lock").
@@ -278,13 +279,31 @@ Item {
             }
         }
 
-        SongAndArtistText {
-            visible: songTextVisible && songTextAboveProgressBar
+        Repeater {
+            model: root.contentOrder
+            delegate: Loader {
+                visible: item ? item.visible : true
+                Layout.fillWidth: true
+                Layout.leftMargin: root.contentPadding
+                Layout.rightMargin: root.contentPadding
+                Layout.topMargin: modelData === "song" ? 5 : modelData === "volume" ? 10 : 0
+                sourceComponent: root.contentComponent(modelData)
+            }
+        }
+
+        // Bottom padding for the content
+        Item {
             Layout.fillWidth: true
-            Layout.leftMargin: 10
-            Layout.rightMargin: 10
-            Layout.bottomMargin: 5
-            textAlignment: songTextAlignment
+            Layout.preferredHeight: root.contentBottomPadding
+        }
+
+    }
+
+    Component {
+        id: songComponent
+        SongAndArtistText {
+            visible: root.songTextVisible
+            textAlignment: root.songTextAlignment
             scrollingSpeed: plasmoid.configuration.fullViewTextScrollingSpeed
             title: player.title
             artists: player.artists
@@ -296,11 +315,12 @@ Item {
             hideAlbumForSingles: plasmoid.configuration.fullHideAlbumForSingles
             scrollingEnabled: widget.expanded
         }
+    }
 
+    Component {
+        id: progressComponent
         TrackPositionSlider {
-            visible: progressBarVisible
-            Layout.leftMargin: 10
-            Layout.rightMargin: 10
+            visible: root.progressBarVisible
             songPosition: player.songPosition
             songLength: player.songLength
             playing: player.playbackStatus === Mpris.PlaybackStatus.Playing
@@ -312,31 +332,12 @@ Item {
                 player.updatePosition()
             }
         }
+    }
 
-        SongAndArtistText {
-            visible: songTextVisible && !songTextAboveProgressBar
-            Layout.fillWidth: true
-            Layout.leftMargin: 10
-            Layout.rightMargin: 10
-            Layout.topMargin: 5
-            textAlignment: songTextAlignment
-            scrollingSpeed: plasmoid.configuration.fullViewTextScrollingSpeed
-            title: player.title
-            artists: player.artists
-            album: player.album
-            textFont: baseFont
-            titlePosition: plasmoid.configuration.fullTitlePosition
-            artistsPosition: plasmoid.configuration.fullArtistsPosition
-            albumPosition: plasmoid.configuration.fullAlbumPosition
-            hideAlbumForSingles: plasmoid.configuration.fullHideAlbumForSingles
-            scrollingEnabled: widget.expanded
-        }
-
+    Component {
+        id: volumeComponent
         VolumeBar {
-            visible: volumeControlVisible
-            Layout.leftMargin: 40
-            Layout.rightMargin: 40
-            Layout.topMargin: 10
+            visible: root.volumeControlVisible
             volume: player.volume
             onSetVolume: (vol) => {
                 player.setVolume(vol)
@@ -348,25 +349,22 @@ Item {
                 player.changeVolume(-volumeStep / 100, false)
             }
         }
+    }
 
+    Component {
+        id: controlsComponent
         Item {
-            visible: shuffleVisible || playbackControlsVisible || loopVisible
-            Layout.leftMargin: 20
-            Layout.rightMargin: 20
-            Layout.bottomMargin: 10
-            Layout.fillWidth: playbackControlsFitWidth
-            Layout.alignment: playbackControlsFitWidth ? 0 : Qt.AlignHCenter
-            Layout.preferredWidth: playbackControlsFitWidth ? -1 : row.implicitWidth
-            Layout.preferredHeight: row.implicitHeight
+            visible: root.shuffleVisible || root.playbackControlsVisible || root.loopVisible
+            implicitHeight: row.implicitHeight
+            implicitWidth: row.implicitWidth
             RowLayout {
                 id: row
-
-                width: playbackControlsFitWidth ? parent.width : implicitWidth
+                width: root.playbackControlsFitWidth ? parent.width : implicitWidth
                 height: implicitHeight
                 anchors.centerIn: parent
 
                 CommandIcon {
-                    visible: shuffleVisible
+                    visible: root.shuffleVisible
                     enabled: player.canChangeShuffle
                     Layout.alignment: Qt.AlignHCenter
                     size: Kirigami.Units.iconSizes.medium
@@ -376,7 +374,7 @@ Item {
                 }
 
                 CommandIcon {
-                    visible: playbackControlsVisible
+                    visible: root.playbackControlsVisible
                     enabled: player.canGoPrevious
                     Layout.alignment: Qt.AlignHCenter
                     size: Kirigami.Units.iconSizes.medium
@@ -385,7 +383,7 @@ Item {
                 }
 
                 CommandIcon {
-                    visible: playbackControlsVisible
+                    visible: root.playbackControlsVisible
                     enabled: player.playbackStatus === Mpris.PlaybackStatus.Playing ? player.canPause : player.canPlay
                     Layout.alignment: Qt.AlignHCenter
                     size: Kirigami.Units.iconSizes.large
@@ -394,7 +392,7 @@ Item {
                 }
 
                 CommandIcon {
-                    visible: playbackControlsVisible
+                    visible: root.playbackControlsVisible
                     enabled: player.canGoNext
                     Layout.alignment: Qt.AlignHCenter
                     size: Kirigami.Units.iconSizes.medium
@@ -403,7 +401,7 @@ Item {
                 }
 
                 CommandIcon {
-                    visible: loopVisible
+                    visible: root.loopVisible
                     enabled: player.canChangeLoopStatus
                     Layout.alignment: Qt.AlignHCenter
                     size: Kirigami.Units.iconSizes.medium
@@ -418,11 +416,26 @@ Item {
                         player.setLoopStatus(status);
                     }
                 }
-
             }
 
+            // Keep the popup min-width in sync with the controls' natural width
+            Binding {
+                target: root
+                property: "controlsMinWidth"
+                value: row.implicitWidth
+                when: root.shuffleVisible || root.playbackControlsVisible || root.loopVisible
+            }
         }
+    }
 
+    function contentComponent(key) {
+        switch (key) {
+        case "song": return songComponent;
+        case "progress": return progressComponent;
+        case "volume": return volumeComponent;
+        case "controls": return controlsComponent;
+        }
+        return null;
     }
 
     // Pin / keep-open button. When pinned the popup stays open on deactivation.

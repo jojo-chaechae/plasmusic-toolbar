@@ -126,12 +126,6 @@
         <entry name="fullAlbumCoverAsBackground" type="Bool">
             <default>false</default>
         </entry>
-        <entry name="fullAlbumCoverVerticalAlignment" type="Int">
-            <default>1</default>
-        </entry>
-        <entry name="fullAlbumCoverPadding" type="Int">
-            <default>0</default>
-        </entry>
         <entry name="fullAlbumCoverTintBackground" type="Bool">
             <default>false</default>
         </entry>
@@ -140,6 +134,18 @@
         </entry>
         <entry name="fullAlbumCoverTintUseContrastText" type="Bool">
             <default>true</default>
+        </entry>
+        <entry name="fullAlbumCoverVerticalAlignment" type="Int">
+            <default>1</default>
+        </entry>
+        <entry name="fullAlbumCoverPadding" type="Int">
+            <default>0</default>
+        </entry>
+        <entry name="fullViewContentPadding" type="Int">
+            <default>10</default>
+        </entry>
+        <entry name="fullViewContentPaddingBottom" type="Int">
+            <default>10</default>
         </entry>
         <entry name="fullViewThumbnailVisible" type="Bool">
             <default>true</default>
@@ -168,8 +174,8 @@
         <entry name="fullViewSongTextAlignment" type="Int">
             <default>4</default>
         </entry>
-        <entry name="fullViewSongTextPosition" type="Int">
-            <default>1</default>
+        <entry name="fullViewVerticalOrder" type="String">
+            <default>song,progress,volume,controls</default>
         </entry>
         <entry name="fullViewMinWidth" type="Int">
             <default>100</default>
