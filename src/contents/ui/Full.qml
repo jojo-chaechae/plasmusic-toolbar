@@ -32,12 +32,9 @@ Item {
     // Manually control whether the text uses album-derived contrast colors when the tint is active
     readonly property bool useAlbumContrastText: albumCoverBackground || (albumCoverTintBackground && albumCoverTintUseContrastText)
     property bool thumbnailVisible: plasmoid.configuration.fullViewThumbnailVisible
-<<<<<<< HEAD
     property int albumCoverVerticalAlignment: plasmoid.configuration.fullAlbumCoverVerticalAlignment
     property int albumCoverPadding: plasmoid.configuration.fullAlbumCoverPadding
-=======
     property bool showPinButton: plasmoid.configuration.showPinButton
->>>>>>> feat/pin-button
     property bool progressBarVisible: plasmoid.configuration.fullViewProgressBarVisible
     property bool volumeControlVisible: plasmoid.configuration.fullViewVolumeControlVisible
     property bool shuffleVisible: plasmoid.configuration.fullViewShuffleVisible
