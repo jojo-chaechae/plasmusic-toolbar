@@ -32,8 +32,12 @@ Item {
     // Manually control whether the text uses album-derived contrast colors when the tint is active
     readonly property bool useAlbumContrastText: albumCoverBackground || (albumCoverTintBackground && albumCoverTintUseContrastText)
     property bool thumbnailVisible: plasmoid.configuration.fullViewThumbnailVisible
+<<<<<<< HEAD
     property int albumCoverVerticalAlignment: plasmoid.configuration.fullAlbumCoverVerticalAlignment
     property int albumCoverPadding: plasmoid.configuration.fullAlbumCoverPadding
+=======
+    property bool showPinButton: plasmoid.configuration.showPinButton
+>>>>>>> feat/pin-button
     property bool progressBarVisible: plasmoid.configuration.fullViewProgressBarVisible
     property bool volumeControlVisible: plasmoid.configuration.fullViewVolumeControlVisible
     property bool shuffleVisible: plasmoid.configuration.fullViewShuffleVisible
@@ -422,5 +426,19 @@ Item {
 
         }
 
+    }
+
+    // Pin / keep-open button. When pinned the popup stays open on deactivation.
+    CommandIcon {
+        id: pinButton
+        visible: root.showPinButton
+        anchors.top: parent.top
+        anchors.right: parent.right
+        anchors.topMargin: Kirigami.Units.smallSpacing
+        anchors.rightMargin: 20
+        size: Kirigami.Units.iconSizes.smallMedium
+        source: widget.hideOnWindowDeactivate ? "pin" : "window-pin"
+        active: !widget.hideOnWindowDeactivate
+        onClicked: widget.hideOnWindowDeactivate = !widget.hideOnWindowDeactivate
     }
 }
