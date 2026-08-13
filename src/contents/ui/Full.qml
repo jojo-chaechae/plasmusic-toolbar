@@ -23,9 +23,15 @@ Item {
     property bool albumCoverBackground: plasmoid.configuration.fullAlbumCoverAsBackground
     property bool albumCoverTintBackground: plasmoid.configuration.fullAlbumCoverTintBackground
     property real albumCoverTintOpacity: plasmoid.configuration.fullAlbumCoverTintOpacity
+    property bool albumCoverTintGradient: plasmoid.configuration.fullAlbumCoverTintGradient
     property bool albumCoverTintUseContrastText: plasmoid.configuration.fullAlbumCoverTintUseContrastText
     // Manually control whether the text uses album-derived contrast colors when the tint is active
     readonly property bool useAlbumContrastText: albumCoverBackground || (albumCoverTintBackground && albumCoverTintUseContrastText)
+
+    // Applies the configured tint opacity to a color
+    function tintColor(c) {
+        return Qt.rgba(c.r, c.g, c.b, albumCoverTintOpacity);
+    }
     property bool thumbnailVisible: plasmoid.configuration.fullViewThumbnailVisible
     property bool showPinButton: plasmoid.configuration.showPinButton
     property int albumCoverVerticalAlignment: plasmoid.configuration.fullAlbumCoverVerticalAlignment
@@ -138,11 +144,25 @@ Item {
     }
 
     // A subtle translucent tint derived from the album cover average color.
+    // Optionally a vertical gradient generated from the album art colors.
     Rectangle {
         id: tintBackground
         visible: albumCoverTintBackground
         anchors.fill: parent
-        color: Qt.rgba(imageColors.bgColor.r, imageColors.bgColor.g, imageColors.bgColor.b, albumCoverTintOpacity)
+        gradient: albumCoverTintGradient ? tintGradient : flatGradient
+    }
+
+    Gradient {
+        id: flatGradient
+        GradientStop { position: 0.0; color: root.tintColor(imageColors.bgColor) }
+        GradientStop { position: 1.0; color: root.tintColor(imageColors.bgColor) }
+    }
+
+    Gradient {
+        id: tintGradient
+        GradientStop { position: 0.0; color: root.tintColor(Kirigami.ColorUtils.tintWithAlpha(imageColors.bgColor, "white", 0.35)) }
+        GradientStop { position: 0.5; color: root.tintColor(imageColors.bgColor) }
+        GradientStop { position: 1.0; color: root.tintColor(Kirigami.ColorUtils.tintWithAlpha(imageColors.bgColor, "black", 0.35)) }
     }
 
 
