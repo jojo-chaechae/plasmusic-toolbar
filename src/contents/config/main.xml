@@ -159,8 +159,8 @@
         <entry name="fullViewContentPaddingBottom" type="Int">
             <default>10</default>
         </entry>
-        <entry name="fullViewSongTextPosition" type="Int">
-            <default>1</default>
+        <entry name="fullViewVerticalOrder" type="String">
+            <default>song,progress,volume,controls</default>
         </entry>
         <entry name="fullViewMinWidth" type="Int">
             <default>100</default>
