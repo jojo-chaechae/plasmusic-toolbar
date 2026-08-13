@@ -22,6 +22,7 @@ KCM.SimpleKCM {
     property alias cfg_fullAlbumCoverAsBackground: fullAlbumCoverAsBackground.checked
     property alias cfg_fullAlbumCoverTintBackground: fullAlbumCoverTintBackground.checked
     property alias cfg_fullAlbumCoverTintOpacity: fullAlbumCoverTintOpacity.value
+    property alias cfg_fullAlbumCoverTintGradient: fullAlbumCoverTintGradient.checked
     property alias cfg_fullAlbumCoverTintUseContrastText: fullAlbumCoverTintUseContrastText.checked
     property alias cfg_fullHideAlbumForSingles: fullHideAlbumForSingles.checked
     property alias cfg_fullViewThumbnailVisible: fullViewThumbnailVisible.checked
@@ -488,6 +489,12 @@ KCM.SimpleKCM {
             stepSize: 0.05
             value: 0.2
             Kirigami.FormData.label: i18n("Background tint opacity:")
+        }
+
+        CheckBox {
+            Kirigami.FormData.label: i18n("Use album-derived gradient")
+            enabled: fullAlbumCoverTintBackground.checked
+            id: fullAlbumCoverTintGradient
         }
 
         CheckBox {
