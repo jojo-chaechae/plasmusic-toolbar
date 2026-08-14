@@ -207,6 +207,11 @@ QtObject {
         const displayLines = []
         const displayTimestamps = []
         const displayIndices = []
+        const leadingBreak = parsed.length > 0 && parsed[0].time > root.breakThreshold
+        if (leadingBreak) {
+            displayLines.push("♪")
+            displayTimestamps.push(-1)
+        }
         for (let i = 0; i < parsed.length; ++i) {
             if (i > 0 && parsed[i].time - parsed[i - 1].time > root.breakThreshold) {
                 displayLines.push("♪")
@@ -253,9 +258,11 @@ QtObject {
             index = i
         }
         if (index < 0) {
-            currentLine = -1
+            const leadingBreak = _timedLines.length > 0
+                && _timedLines[0].time > root.breakThreshold
+            currentLine = leadingBreak ? 0 : -1
             currentLineDuration = 0
-            inBreak = false
+            inBreak = leadingBreak
             return
         }
 
