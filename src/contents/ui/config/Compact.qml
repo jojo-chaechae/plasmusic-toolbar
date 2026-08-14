@@ -17,7 +17,14 @@ KCM.SimpleKCM {
     property alias cfg_skipBackwardControlInPanel: skipBackwardControlInPanel.checked
     property alias cfg_playPauseControlInPanel: playPauseControlInPanel.checked
     property alias cfg_skipForwardControlInPanel: skipForwardControlInPanel.checked
-    property alias cfg_songTextInPanel: songTextInPanel.checked
+    property alias cfg_panelTextMode: panelTextMode.value
+    property alias cfg_panelTextHoverSwap: panelTextHoverSwap.checked
+    property alias cfg_panelTextLineCount: panelTextLineCount.value
+    property alias cfg_panelTextStableWidth: panelTextStableWidth.checked
+    property alias cfg_panelTextReplaceIntermission: panelTextReplaceIntermission.checked
+    property alias cfg_panelMiniLyricsAlignment: panelMiniLyricsAlignment.value
+    property alias cfg_panelMiniLyricsAnimation: panelMiniLyricsAnimation.value
+    property alias cfg_panelMiniLyricsClickable: panelMiniLyricsClickable.checked
     property alias cfg_iconInPanel: iconInPanel.checked
     property alias cfg_maxSongWidthInPanel: maxSongWidthInPanel.value
     property alias cfg_songTextFixedWidth: songTextFixedWidth.value
@@ -47,7 +54,7 @@ KCM.SimpleKCM {
 
         Kirigami.Separator {
             Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18n("Layout")
+            Kirigami.FormData.label: i18n("Panel layout")
         }
 
         RowLayout {
@@ -106,9 +113,148 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Show icon:")
         }
 
+        Kirigami.Separator {
+            Kirigami.FormData.isSection: true
+            Kirigami.FormData.label: i18n("Panel text")
+        }
+
+        ButtonGroup {
+            id: panelTextMode
+            property int value: 0
+        }
+
+        RadioButton {
+            Kirigami.FormData.label: i18n("Panel text:")
+            text: i18n("Song info")
+            checked: panelTextMode.value === 0
+            onCheckedChanged: if (checked) panelTextMode.value = 0
+            ButtonGroup.group: panelTextMode
+        }
+
+        RadioButton {
+            text: i18n("Lyrics")
+            checked: panelTextMode.value === 1
+            onCheckedChanged: if (checked) panelTextMode.value = 1
+            ButtonGroup.group: panelTextMode
+        }
+
+        RadioButton {
+            text: i18n("Song info + lyrics (experimental)")
+            checked: panelTextMode.value === 2
+            onCheckedChanged: if (checked) panelTextMode.value = 2
+            ButtonGroup.group: panelTextMode
+        }
+
+        RadioButton {
+            text: i18n("Mini lyrics (experimental)")
+            checked: panelTextMode.value === 3
+            onCheckedChanged: if (checked) panelTextMode.value = 3
+            ButtonGroup.group: panelTextMode
+        }
+
+        RadioButton {
+            text: i18n("None")
+            checked: panelTextMode.value === 4
+            onCheckedChanged: if (checked) panelTextMode.value = 4
+            ButtonGroup.group: panelTextMode
+        }
+
+        ButtonGroup {
+            id: panelMiniLyricsAlignment
+            property int value: Qt.AlignCenter
+        }
+
+        RadioButton {
+            Kirigami.FormData.label: i18n("Mini lyrics alignment:")
+            text: i18n("Left")
+            enabled: panelTextMode.value === 3
+            checked: panelMiniLyricsAlignment.value === Qt.AlignLeft
+            onCheckedChanged: if (checked) panelMiniLyricsAlignment.value = Qt.AlignLeft
+            ButtonGroup.group: panelMiniLyricsAlignment
+        }
+
+        RadioButton {
+            text: i18n("Center (experimental)")
+            enabled: panelTextMode.value === 3
+            checked: panelMiniLyricsAlignment.value === Qt.AlignCenter
+            onCheckedChanged: if (checked) panelMiniLyricsAlignment.value = Qt.AlignCenter
+            ButtonGroup.group: panelMiniLyricsAlignment
+        }
+
+        RadioButton {
+            text: i18n("Right")
+            enabled: panelTextMode.value === 3
+            checked: panelMiniLyricsAlignment.value === Qt.AlignRight
+            onCheckedChanged: if (checked) panelMiniLyricsAlignment.value = Qt.AlignRight
+            ButtonGroup.group: panelMiniLyricsAlignment
+        }
+
+        ButtonGroup {
+            id: panelMiniLyricsAnimation
+            property int value: 0
+        }
+
+        RadioButton {
+            Kirigami.FormData.label: i18n("Mini lyrics animation:")
+            text: i18n("None")
+            enabled: panelTextMode.value === 1 || panelTextMode.value === 3
+            checked: panelMiniLyricsAnimation.value === 0
+            onCheckedChanged: if (checked) panelMiniLyricsAnimation.value = 0
+            ButtonGroup.group: panelMiniLyricsAnimation
+        }
+
+        RadioButton {
+            text: i18n("Glow (experimental)")
+            enabled: panelTextMode.value === 1 || panelTextMode.value === 3
+            checked: panelMiniLyricsAnimation.value === 1
+            onCheckedChanged: if (checked) panelMiniLyricsAnimation.value = 1
+            ButtonGroup.group: panelMiniLyricsAnimation
+        }
+
         CheckBox {
-            id: songTextInPanel
-            Kirigami.FormData.label: i18n("Show song text")
+            id: panelMiniLyricsClickable
+            enabled: panelTextMode.value === 3
+            Kirigami.FormData.label: i18n("Make mini lyrics clickable")
+        }
+
+        CheckBox {
+            id: panelTextHoverSwap
+            enabled: panelTextMode.value < 2
+            Kirigami.FormData.label: i18n("Show other text on hover")
+        }
+
+        ButtonGroup {
+            id: panelTextLineCount
+            property int value: 1
+        }
+
+        RadioButton {
+            Kirigami.FormData.label: i18n("Combined text lines:")
+            text: i18n("One line")
+            enabled: panelTextMode.value === 2
+            checked: panelTextLineCount.value === 1
+            onCheckedChanged: if (checked) panelTextLineCount.value = 1
+            ButtonGroup.group: panelTextLineCount
+        }
+
+        RadioButton {
+            text: i18n("Two lines (experimental)")
+            enabled: panelTextMode.value === 2
+            checked: panelTextLineCount.value === 2
+            onCheckedChanged: if (checked) panelTextLineCount.value = 2
+            ButtonGroup.group: panelTextLineCount
+        }
+
+        CheckBox {
+            id: panelTextStableWidth
+            enabled: !useSongTextFixedWidth.checked && !fillAvailableSpaceCheckbox.checked
+            Kirigami.FormData.label: i18n("Keep panel width stable for each song")
+        }
+
+        CheckBox {
+            id: panelTextReplaceIntermission
+            enabled: panelTextMode.value > 0
+            Kirigami.FormData.label: i18n("Show song info during lyric intermissions")
         }
 
         CheckBox {
@@ -168,7 +314,7 @@ KCM.SimpleKCM {
 
         Kirigami.Separator {
             Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18n("Song text customization")
+            Kirigami.FormData.label: i18n("Song info")
         }
 
         // group for title
@@ -321,9 +467,14 @@ KCM.SimpleKCM {
             height: 0.5 * Kirigami.Units.gridUnit
         }
 
+        Kirigami.Separator {
+            Kirigami.FormData.isSection: true
+            Kirigami.FormData.label: i18n("Panel text sizing")
+        }
+
         CheckBox {
             id: useSongTextFixedWidth
-            enabled: songTextInPanel.checked && fillAvailableSpaceCheckbox
+            enabled: panelTextMode.value !== 4
             Kirigami.FormData.label: i18n("Use fixed width")
         }
 
@@ -332,7 +483,7 @@ KCM.SimpleKCM {
             from: 0
             to: 1000
             Kirigami.FormData.label: i18n("fixed width:")
-            enabled: useSongTextFixedWidth.checked && songTextInPanel.checked && fillAvailableSpaceCheckbox
+            enabled: useSongTextFixedWidth.checked && panelTextMode.value !== 4
         }
 
         SpinBox {
@@ -340,7 +491,7 @@ KCM.SimpleKCM {
             from: 0
             to: 1000
             Kirigami.FormData.label: i18n("max width:")
-            enabled: !useSongTextFixedWidth.checked && songTextInPanel.checked && fillAvailableSpaceCheckbox
+            enabled: !useSongTextFixedWidth.checked && panelTextMode.value !== 4
         }
 
         Item {

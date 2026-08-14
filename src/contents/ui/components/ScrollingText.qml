@@ -16,7 +16,7 @@ Item {
         return root.maxWidth < staticLabel.implicitWidth;
     }
 
-    width: Math.min(maxWidth, staticLabel.implicitWidth)
+    width: fillAvailableWidth ? maxWidth : Math.min(maxWidth, staticLabel.implicitWidth)
     implicitHeight: staticLabel.implicitHeight
     implicitWidth: width
 
@@ -38,6 +38,7 @@ Item {
     readonly property bool overflowFades: root.truncateStyle === ScrollingText.TruncateStyle.FadeOut
 
     property bool scrollingEnabled: true
+    property bool fillAvailableWidth: false
     property bool scrollResetOnPause: false
     property bool forcePauseScrolling: false
 

@@ -26,6 +26,9 @@ Item {
     property color animationColor: Kirigami.Theme.highlightColor
     property bool seekEnabled: true
 
+    // Lets panel layouts grow to fit a lyric line before ScrollingText takes over.
+    readonly property real contentImplicitWidth: lyricsMetrics.implicitWidth
+
     signal seekRequested(timestamp: double)
     readonly property font lyricFont: {
         if (fontSize <= 0) return textFont
@@ -40,6 +43,15 @@ Item {
     implicitHeight: lineHeight
     Layout.fillWidth: true
     anchors.fill: parent
+
+    Text {
+        id: lyricsMetrics
+        visible: false
+        text: root.lines.join("\n")
+        font: root.lyricFont
+        textFormat: Text.PlainText
+        wrapMode: Text.NoWrap
+    }
 
     readonly property int visibleLineCount: Math.max(1, Math.floor(height / lineHeight))
 
@@ -63,6 +75,12 @@ Item {
     function timestampForLine(index) {
         if (!lineTimestamps || index < 0 || index >= lineTimestamps.length) return -1
         return Number(lineTimestamps[index])
+    }
+
+    function scrollByWheel(delta) {
+        if (!flickable.interactive || !delta) return
+        const maximum = Math.max(0, flickable.contentHeight - flickable.height)
+        flickable.contentY = Math.max(0, Math.min(maximum, flickable.contentY - delta / 120 * lineHeight * 3))
     }
 
     NumberAnimation {
@@ -142,6 +160,7 @@ Item {
                         id: lineText
                         anchors.fill: parent
                         maxWidth: parent.width
+                        fillAvailableWidth: true
                         text: modelData
                         font: {
                             let font = root.lyricFont

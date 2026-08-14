@@ -14,6 +14,37 @@ Item {
 
     readonly property bool horizontal: widget.formFactor === PlasmaCore.Types.Horizontal
     readonly property bool fillAvailableSpace: plasmoid.configuration.fillAvailableSpace
+    readonly property int panelTextMode: plasmoid.configuration.panelTextMode
+    readonly property bool panelTextHoverSwap: plasmoid.configuration.panelTextHoverSwap
+    readonly property int panelTextLineCount: plasmoid.configuration.panelTextLineCount
+    readonly property bool panelTextStableWidth: plasmoid.configuration.panelTextStableWidth
+    readonly property bool panelTextReplaceIntermission: plasmoid.configuration.panelTextReplaceIntermission
+    readonly property bool miniLyricsMode: panelTextMode === 3
+    readonly property int miniLyricsAlignment: plasmoid.configuration.panelMiniLyricsAlignment
+    readonly property int miniLyricsAnimation: plasmoid.configuration.panelMiniLyricsAnimation
+    readonly property int panelLyricsAnimation: plasmoid.configuration.panelMiniLyricsAnimation
+    readonly property bool miniLyricsClickable: plasmoid.configuration.panelMiniLyricsClickable
+    readonly property bool panelTextStableWidthActive: panelTextStableWidth
+        || (panelTextHoverSwap && panelTextMode !== 2)
+    readonly property bool lyricsConfigured: panelTextMode === 1 || panelTextMode === 2
+        || panelTextMode === 3 || (panelTextHoverSwap && panelTextMode < 2)
+    readonly property bool lyricsAvailable: lyricsManager.available
+    readonly property bool lyricsIntermission: lyricsManager.currentLine >= 0
+        && lyricsManager.currentLine < lyricsManager.lines.length
+        && Number(lyricsManager.lineTimestamps[lyricsManager.currentLine]) < 0
+    readonly property bool hoverSwapActive: panelTextHoverSwap && lyricsAvailable && panelHoverHandler.hovered
+    readonly property bool showSongInfo: (panelTextMode === 2
+            || (panelTextMode === 0 && !hoverSwapActive)
+            || (panelTextMode === 1 && (!lyricsAvailable || hoverSwapActive
+                || (panelTextReplaceIntermission && lyricsIntermission)))
+            || (panelTextMode === 3 && panelTextReplaceIntermission && lyricsIntermission))
+    readonly property bool showLyrics: lyricsConfigured
+        && lyricsAvailable
+        && (!panelTextReplaceIntermission || !lyricsIntermission || panelTextMode === 0)
+        && (panelTextMode === 2
+            || (panelTextMode === 0 && hoverSwapActive)
+            || (panelTextMode === 1 && !hoverSwapActive)
+            || panelTextMode === 3)
 
     Layout.preferredWidth: horizontal ? grid.implicitWidth + lengthMargin * 2 : grid.implicitWidth
     Layout.preferredHeight: !horizontal ? grid.implicitHeight + lengthMargin * 2 : grid.implicitHeight
@@ -38,6 +69,16 @@ Item {
     readonly property color contrastColor: backgroundColorBrightness === Kirigami.ColorUtils.Dark ? "white" : "black"
     readonly property color foregroundColorFromImage: Kirigami.ColorUtils.tintWithAlpha(imageColor, contrastColor, .6)
     property color foregroundColor: useImageColors ? foregroundColorFromImage : Kirigami.Theme.textColor
+
+    LyricsManager {
+        id: lyricsManager
+        enabled: compact.lyricsConfigured
+        title: player.title
+        artists: player.artists
+        album: player.album
+        songLength: player.songLength
+        songPosition: player.songPosition
+    }
 
     Behavior on backgroundColor {
         ColorAnimation {
@@ -80,7 +121,9 @@ Item {
     }
 
     MouseAreaWithWheelHandler {
+        id: panelMouseArea
         anchors.fill: parent
+        hoverEnabled: true
         acceptedButtons: Qt.LeftButton | Qt.MiddleButton | Qt.BackButton | Qt.ForwardButton
         propagateComposedEvents: true
 
@@ -115,6 +158,11 @@ Item {
         onWheelDown: {
             player.changeVolume(-plasmoid.configuration.volumeStep / 100, true);
         }
+    }
+
+    HoverHandler {
+        id: panelHoverHandler
+        acceptedDevices: PointerDevice.Mouse | PointerDevice.TouchPad
     }
 
     GridLayout {
@@ -152,14 +200,54 @@ Item {
 
         // This item is used to fill the available space when the song text is not enabled.
         Item {
-            visible: !plasmoid.configuration.songTextInPanel && fillAvailableSpace
+            visible: !compact.showSongInfo && !compact.showLyrics && fillAvailableSpace
             Layout.fillHeight: true
             Layout.fillWidth: true
         }
 
         GridLayout {
+            id: panelTextGrid
+            visible: compact.showSongInfo || compact.showLyrics
+            columns: horizontal && panelTextLineCount === 1 && panelTextMode === 2 ? 2 : 1
+            rows: horizontal && panelTextLineCount === 1 && panelTextMode === 2 ? 1 : 2
+            rowSpacing: panelTextMode === 2 && panelTextLineCount === 2 ? 0 : Kirigami.Units.smallSpacing
+            readonly property bool combinedTwoLines: panelTextMode === 2 && panelTextLineCount === 2
+            readonly property real panelLineHeight: Math.max(Kirigami.Units.gridUnit, baseFont.pixelSize * 1.35)
+            readonly property real configuredTextWidth: Math.max(1, plasmoid.configuration.maxSongWidthInPanel)
+            readonly property real lyricWidth: Math.min(lyricsView.contentImplicitWidth, configuredTextWidth)
+            readonly property real songWidth: Math.min(songAndArtistText.implicitWidth, configuredTextWidth)
+            readonly property real stableWidth: {
+                let width = 0
+                if (panelTextHoverSwap && panelTextMode !== 2) {
+                    width = Math.max(songWidth, lyricWidth)
+                } else if (compact.showSongInfo && compact.showLyrics) {
+                    width = panelTextLineCount === 1
+                        ? songWidth + lyricWidth + Kirigami.Units.smallSpacing
+                        : Math.max(songWidth, lyricWidth)
+                } else {
+                    width = compact.showLyrics ? lyricWidth : songWidth
+                }
+                return Math.min(width, configuredTextWidth)
+            }
+            Layout.preferredWidth: horizontal && songGrid.useFixedWidth
+                ? songGrid.fxdWidth
+                : horizontal && !compact.fillAvailableSpace && compact.panelTextStableWidthActive
+                    ? stableWidth : -1
+            Layout.minimumWidth: horizontal && songGrid.useFixedWidth
+                ? songGrid.fxdWidth : 0
+            Layout.maximumWidth: horizontal && songGrid.useFixedWidth
+                ? songGrid.fxdWidth
+                : horizontal && !compact.fillAvailableSpace ? configuredTextWidth : -1
+            Layout.preferredHeight: horizontal && combinedTwoLines ? panelLineHeight * 2 : -1
+            Layout.fillHeight: !combinedTwoLines || fillAvailableSpace
+            Layout.fillWidth: !horizontal || (fillAvailableSpace && !songGrid.useFixedWidth)
+                || (horizontal && panelTextMode === 2)
+            Layout.alignment: horizontal
+                ? (panelTextMode >= 2 ? Qt.AlignVCenter : songGrid.textAlignment | Qt.AlignVCenter)
+                : Qt.AlignHCenter | songGrid.textAlignment
+            GridLayout {
             id: songGrid
-            visible: plasmoid.configuration.songTextInPanel
+            visible: compact.showSongInfo
 
             columns: horizontal ? songGrid.children.length : 1
             rows: horizontal ? 1 : songGrid.children.length
@@ -169,11 +257,15 @@ Item {
             readonly property bool useFixedWidth: plasmoid.configuration.useSongTextFixedWidth
             readonly property int length: horizontal ? width : height
 
-            Layout.preferredWidth: horizontal && useFixedWidth && !fillAvailableSpace ? fxdWidth : -1
+            Layout.preferredWidth: horizontal && useFixedWidth && !fillAvailableSpace
+                    && !(panelTextMode === 2 && panelTextLineCount === 1) ? fxdWidth : -1
             Layout.preferredHeight: !horizontal && useFixedWidth && !fillAvailableSpace ? fxdWidth : -1
-            Layout.fillHeight: horizontal || fillAvailableSpace
+            Layout.fillHeight: !panelTextGrid.combinedTwoLines || fillAvailableSpace
             Layout.fillWidth: !horizontal || fillAvailableSpace
-            Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+                || (horizontal && panelTextMode === 2)
+            Layout.alignment: horizontal
+                ? (panelTextMode === 2 ? Qt.AlignVCenter : songGrid.textAlignment | Qt.AlignVCenter)
+                : Qt.AlignHCenter | songGrid.textAlignment
 
             Item {
                 readonly property bool fill: [Qt.AlignRight, Qt.AlignCenter].includes(songGrid.textAlignment)
@@ -184,7 +276,7 @@ Item {
             Item {
                 id: songAndArtistTextColumn
                 Layout.fillHeight: horizontal
-                Layout.fillWidth: !horizontal
+                Layout.fillWidth: !horizontal || (horizontal && panelTextMode === 2)
                 Layout.preferredHeight: !horizontal ? songAndArtistText.width : null
                 Layout.preferredWidth: horizontal ? songAndArtistText.width : null
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
@@ -202,7 +294,7 @@ Item {
                     }
 
                     maxWidth: {
-                        if (fillAvailableSpace || songGrid.useFixedWidth) {
+                        if (fillAvailableSpace || songGrid.useFixedWidth || panelTextMode === 2) {
                             return songGrid.length
                         }
                         return plasmoid.configuration.maxSongWidthInPanel
@@ -211,9 +303,15 @@ Item {
                     scrollingSpeed: plasmoid.configuration.textScrollingSpeed
                     scrollingResetOnPause: plasmoid.configuration.textScrollingResetOnPause
                     scrollingEnabled: plasmoid.configuration.textScrollingEnabled
-                    titlePosition: plasmoid.configuration.titlePosition
-                    artistsPosition: plasmoid.configuration.artistsPosition
-                    albumPosition: plasmoid.configuration.albumPosition
+                    titlePosition: panelTextGrid.combinedTwoLines
+                        ? SongAndArtistText.TextPosition.FirstLine
+                        : plasmoid.configuration.titlePosition
+                    artistsPosition: panelTextGrid.combinedTwoLines
+                        ? SongAndArtistText.TextPosition.FirstLine
+                        : plasmoid.configuration.artistsPosition
+                    albumPosition: panelTextGrid.combinedTwoLines
+                        ? SongAndArtistText.TextPosition.FirstLine
+                        : plasmoid.configuration.albumPosition
                     hideAlbumForSingles: plasmoid.configuration.compactHideAlbumForSingles
                     forcePauseScrolling: {
                         if (!plasmoid.configuration.pauseTextScrollingWhileMediaIsNotPlaying) {
@@ -236,6 +334,84 @@ Item {
                 readonly property bool fill: [Qt.AlignLeft, Qt.AlignCenter].includes(songGrid.textAlignment)
                 Layout.fillHeight: !horizontal && fill
                 Layout.fillWidth: horizontal && fill
+            }
+
+            }
+
+            Item {
+                id: panelLyrics
+                visible: compact.showLyrics
+                Layout.fillWidth: true
+                Layout.fillHeight: !panelTextGrid.combinedTwoLines || fillAvailableSpace
+                Layout.minimumWidth: 0
+                Layout.minimumHeight: 0
+                Layout.alignment: horizontal
+                    ? (panelTextMode >= 2 ? Qt.AlignVCenter : songGrid.textAlignment | Qt.AlignVCenter)
+                    : Qt.AlignHCenter | songGrid.textAlignment
+                Layout.preferredWidth: compact.horizontal && !songGrid.useFixedWidth && !compact.fillAvailableSpace
+                    ? Math.min(Math.max(1, compact.miniLyricsMode ? lyricsView.contentImplicitWidth : lyricsView.implicitWidth),
+                               Math.max(1, plasmoid.configuration.maxSongWidthInPanel))
+                    : -1
+                Layout.preferredHeight: compact.horizontal
+                    ? Math.max(Kirigami.Units.gridUnit, baseFont.pixelSize * 1.35) * (compact.miniLyricsMode ? 3 : 1)
+                    : Math.max(Kirigami.Units.gridUnit, baseFont.pixelSize * 1.35) * (compact.panelTextMode === 2 ? 1 : compact.panelTextLineCount)
+
+                PanelLyricLine {
+                    id: lyricsView
+                    anchors.fill: parent
+                    visible: !compact.miniLyricsMode
+                    lines: lyricsManager.lines
+                    lineTimestamps: lyricsManager.lineTimestamps
+                    currentLine: lyricsManager.currentLine
+                    currentLineDuration: lyricsManager.currentLineDuration
+                    horizontalAlignment: songGrid.textAlignment
+                    textFont: baseFont
+                    textColor: foregroundColor
+                    animationMode: compact.panelLyricsAnimation
+                    animationColor: foregroundColor
+                    seekEnabled: false
+                    onSeekRequested: (timestamp) => player.setPosition(timestamp * 1000)
+                }
+
+                MiniLyrics {
+                    id: miniLyricsView
+                    anchors.fill: parent
+                    visible: compact.miniLyricsMode
+                    lines: lyricsManager.lines
+                    lineTimestamps: lyricsManager.lineTimestamps
+                    currentLine: lyricsManager.currentLine
+                    currentLineDuration: lyricsManager.currentLineDuration
+                    horizontalAlignment: compact.miniLyricsMode ? compact.miniLyricsAlignment : songGrid.textAlignment
+                    textFont: baseFont
+                    textColor: foregroundColor
+                    animationMode: compact.panelLyricsAnimation
+                    animationColor: foregroundColor
+                    scrollingEnabled: compact.miniLyricsMode
+                    seekEnabled: compact.miniLyricsMode && compact.miniLyricsClickable && player.canSeek
+                    onSeekRequested: (timestamp) => player.setPosition(timestamp * 1000)
+                }
+
+                TapHandler {
+                    enabled: compact.miniLyricsMode && !compact.miniLyricsClickable
+                    acceptedButtons: Qt.LeftButton
+                    onTapped: widget.expanded = true
+                }
+
+                // Keep panel volume handling from seeing wheel events over lyrics.
+                WheelHandler {
+                    onWheel: (wheel) => {
+                        if (compact.miniLyricsMode) {
+                            miniLyricsView.scrollByWheel(wheel.angleDelta.y || -wheel.angleDelta.x)
+                        }
+                    }
+                }
+
+                MouseArea {
+                    anchors.fill: parent
+                    enabled: compact.miniLyricsMode && !compact.miniLyricsClickable
+                    acceptedButtons: Qt.LeftButton
+                    onClicked: widget.expanded = !widget.expanded
+                }
             }
         }
 
