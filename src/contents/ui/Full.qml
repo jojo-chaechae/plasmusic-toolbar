@@ -2,6 +2,7 @@ import "./components"
 import QtQuick
 import QtQuick.Layouts
 import org.kde.plasma.core as PlasmaCore
+import org.kde.plasma.plasma5support as Plasma5Support
 import org.kde.plasma.plasmoid
 import org.kde.plasma.components as PlasmaComponents3
 import org.kde.kirigami as Kirigami
@@ -29,6 +30,8 @@ Item {
     property bool thumbnailVisible: plasmoid.configuration.fullViewThumbnailVisible
     property bool albumCoverClickToRaise: plasmoid.configuration.fullViewAlbumCoverClickToRaise
     property bool showPinButton: plasmoid.configuration.showPinButton
+    property bool playbackScriptButtonEnabled: plasmoid.configuration.fullViewPlaybackScriptButtonEnabled
+    property string playbackScriptPath: plasmoid.configuration.fullViewPlaybackScriptPath
     // Horizontal padding for the playback section components (text, slider, volume, controls).
     property int contentPadding: plasmoid.configuration.fullViewContentPadding
     property int contentVerticalPadding: plasmoid.configuration.fullViewContentPaddingVertical
@@ -37,6 +40,7 @@ Item {
     property int mediaSpacing: plasmoid.configuration.fullViewMediaSpacing
     property bool progressBarVisible: plasmoid.configuration.fullViewProgressBarVisible
     property bool volumeControlVisible: plasmoid.configuration.fullViewVolumeControlVisible
+    property bool playbackSectionActionsVisible: plasmoid.configuration.fullViewPlaybackSectionActionsVisible
     property bool shuffleVisible: plasmoid.configuration.fullViewShuffleVisible
     property bool playbackControlsVisible: plasmoid.configuration.fullViewPlaybackControlsVisible
     property bool loopVisible: plasmoid.configuration.fullViewLoopVisible
@@ -65,6 +69,32 @@ Item {
         album: player.album
         songLength: player.songLength
         songPosition: player.songPosition
+    }
+
+    Plasma5Support.DataSource {
+        id: scriptExecutor
+        engine: "executable"
+        connectedSources: []
+
+        onNewData: function(sourceName, data) {
+            disconnectSource(sourceName)
+        }
+
+        function shellQuote(value) {
+            // Keep the configured path a single shell argument, including paths containing spaces or quotes.
+            return "'" + String(value).replace(/\x27/g, "\x27\"\x27\"\x27") + "'"
+        }
+
+        function run(path) {
+            const script = String(path).trim()
+            if (!script) return
+
+            const command = shellQuote(script)
+            if (connectedSources.indexOf(command) !== -1) {
+                disconnectSource(command)
+            }
+            connectSource(command)
+        }
     }
 
     // The Full View max and min width is driven by config values. The window can be resized within these bounds; thumbnail and text adapt.
@@ -297,6 +327,24 @@ Item {
                     sourceComponent: root.contentComponent(modelData)
                 }
             }
+
+            PlaybackSectionActions {
+                visible: root.playbackSectionActionsVisible
+                Layout.preferredHeight: visible ? implicitHeight : 0
+                Layout.minimumHeight: 0
+                Layout.maximumHeight: visible ? implicitHeight : 0
+                Layout.leftMargin: root.contentPadding
+                Layout.rightMargin: root.contentPadding
+                pinVisible: root.showPinButton
+                keepOpen: !widget.hideOnWindowDeactivate
+                albumCoverVisible: root.thumbnailVisible
+                scriptButtonEnabled: root.playbackScriptButtonEnabled
+                scriptPath: root.playbackScriptPath
+                onKeepOpenToggled: widget.hideOnWindowDeactivate = !widget.hideOnWindowDeactivate
+                onAlbumCoverToggled: plasmoid.configuration.fullViewThumbnailVisible = !root.thumbnailVisible
+                onScriptRequested: scriptExecutor.run(root.playbackScriptPath)
+                onSettingsRequested: Plasmoid.internalAction("configure").trigger()
+            }
         }
 
         Loader {
@@ -505,33 +553,4 @@ Item {
         return false;
     }
 
-    // Keep-open button. When checked the popup stays open on deactivation.
-    PlasmaComponents3.ToolButton {
-        id: pinButton
-        visible: root.showPinButton
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.topMargin: Kirigami.Units.smallSpacing
-        anchors.rightMargin: Kirigami.Units.smallSpacing
-        z: 100
-        implicitWidth: Kirigami.Units.iconSizes.medium
-        implicitHeight: Kirigami.Units.iconSizes.medium
-        display: PlasmaComponents3.AbstractButton.IconOnly
-        checkable: true
-        icon.name: "window-pin"
-        icon.color: checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
-        text: checked ? i18n("Keep player open") : i18n("Allow player to close automatically")
-
-        Binding {
-            target: pinButton
-            property: "checked"
-            value: !widget.hideOnWindowDeactivate
-        }
-
-        PlasmaComponents3.ToolTip.text: text
-        PlasmaComponents3.ToolTip.visible: hovered || (activeFocus && (focusReason === Qt.TabFocusReason || focusReason === Qt.BacktabFocusReason))
-        Accessible.name: text
-
-        onClicked: widget.hideOnWindowDeactivate = !widget.hideOnWindowDeactivate
-    }
 }

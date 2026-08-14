@@ -57,6 +57,9 @@ KCM.SimpleKCM {
     property alias cfg_fullViewLyricsLineSpacing: fullViewLyricsLineSpacing.value
     property alias cfg_fullViewLyricsAnimation: fullViewLyricsAnimation.currentIndex
     property alias cfg_fullViewLyricsIntermissionThreshold: fullViewLyricsIntermissionThreshold.value
+    property alias cfg_fullViewPlaybackSectionActionsVisible: fullViewPlaybackSectionActionsVisible.checked
+    property alias cfg_fullViewPlaybackScriptButtonEnabled: fullViewPlaybackScriptButtonEnabled.checked
+    property alias cfg_fullViewPlaybackScriptPath: fullViewPlaybackScriptPath.text
     property alias cfg_hideCanBeRaisedTooltip: hideCanBeRaisedTooltip.checked
 
     Kirigami.FormLayout {
@@ -335,6 +338,32 @@ KCM.SimpleKCM {
         CheckBox {
             id: fullViewLoopVisible
             Kirigami.FormData.label: i18n("Show loop control")
+        }
+
+        CheckBox {
+            id: fullViewPlaybackSectionActionsVisible
+            Kirigami.FormData.label: i18n("Show playback section actions")
+        }
+
+        CheckBox {
+            id: fullViewPlaybackScriptButtonEnabled
+            Kirigami.FormData.label: i18n("Show custom script button")
+        }
+
+        RowLayout {
+            Kirigami.FormData.label: i18n("Custom script path:")
+
+            TextField {
+                id: fullViewPlaybackScriptPath
+                Layout.preferredWidth: 20 * Kirigami.Units.gridUnit
+                placeholderText: i18n("Path to an executable script")
+            }
+
+            Button {
+                text: i18n("Browse…")
+                icon.name: "document-open"
+                onClicked: scriptPathDialog.open()
+            }
         }
 
         RowLayout {
@@ -775,5 +804,17 @@ KCM.SimpleKCM {
         id: albumPlaceholderDialog
         property var value: null
         onAccepted: value = selectedFile
+    }
+
+    QtDialogs.FileDialog {
+        id: scriptPathDialog
+        title: i18n("Choose a script")
+        fileMode: QtDialogs.FileDialog.OpenFile
+        onAccepted: {
+            const url = String(selectedFile)
+            fullViewPlaybackScriptPath.text = url.indexOf("file://") === 0
+                ? decodeURIComponent(url.replace(/^file:\/\//, ""))
+                : url
+        }
     }
 }

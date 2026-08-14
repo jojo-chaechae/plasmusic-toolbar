@@ -16,7 +16,7 @@ QtObject {
     property int currentLine: -1
     property int currentLineDuration: 0 // active duration for the current lyric line, in milliseconds
     property bool inBreak: false
-    property int intermissionThreshold: 6 // seconds
+    property int intermissionThreshold: 8 // seconds
     readonly property int breakThreshold: Math.max(1, intermissionThreshold) * 1000 // milliseconds
     property bool available: false
     property var _timedLines: []

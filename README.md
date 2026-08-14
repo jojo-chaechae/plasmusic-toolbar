@@ -33,7 +33,7 @@ Mini-lyrics are disabled by default and can be enabled in **Full View → Media 
 
 - Click a lyric line to seek to its timestamp when the player supports seeking.
 - Long lyric lines can scroll horizontally while the active line is displayed.
-- Large timing gaps can be shown as a `♪` intermission row. The gap threshold is configurable in seconds.
+- Large timing gaps can be shown as a `♪` intermission row. The gap threshold is configurable in seconds and defaults to 8 seconds.
 - The experimental animation selector currently provides `None` and `Glow sweep`.
 - Lyrics are unavailable when LRCLIB has no matching synced lyrics or network access is unavailable.
 
