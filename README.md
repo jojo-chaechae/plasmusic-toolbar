@@ -88,7 +88,7 @@ The KDE Store listing is for the upstream project and does not include this fork
 5. Removing the widget:
 
     ```sh
-    kpackagetool6 -r plasmusic-toolbar --type Plasma/Applet
+    kpackagetool6 -r plasmusic-toolbar-fork --type Plasma/Applet
     ```
 
 
@@ -98,4 +98,4 @@ Want to help translate PlasMusic Toolbar into your language? See [TRANSLATIONS.m
 
 ## 🖼️ Screenshots
 
-TODO: Add updated screenshots for the fork's Full View media and mini-lyrics features.
+Screenshots for the fork's Full View media and mini-lyrics features are still needed. Tracked in [issue #9](https://github.com/jojo-chaechae/plasmusic-toolbar/issues/9).
