@@ -8,13 +8,13 @@
             }
         ],
         "Description": "Show currently playing song information and provide playback controls",
-        "BugReportUrl": "https://github.com/ccatterina/plasmusic-toolbar/issues",
-        "Website": "https://github.com/ccatterina/plasmusic-toolbar",
+        "BugReportUrl": "https://github.com/jojo-chaechae/plasmusic-toolbar/issues",
+        "Website": "https://github.com/jojo-chaechae/plasmusic-toolbar",
         "Icon": "view-media-track",
-        "Id": "plasmusic-toolbar",
+        "Id": "plasmusic-toolbar-fork",
         "License": "GPL3",
         "Name": "PlasMusic Toolbar",
-        "Version": "4.3.1",
+        "Version": "0.1.0",
         "Category": "Multimedia"
     },
     "X-Plasma-API-Minimum-Version": "6.0.4",

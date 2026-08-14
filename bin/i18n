@@ -3,7 +3,7 @@ set -e
 
 CONTENT_DIR="src/contents"
 TRANSLATE_DIR="src/translate"
-PACKAGE_NAME="plasmusic-toolbar"
+PACKAGE_NAME="plasmusic-toolbar-fork"
 
 # https://api.kde.org/frameworks/ki18n/html/prg_guide.html
 EXTOPTS="""

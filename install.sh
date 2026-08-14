@@ -4,7 +4,7 @@ set -euo pipefail
 REPO="https://github.com/jojo-chaechae/plasmusic-toolbar"
 BRANCH="${PLASMUSIC_BRANCH:-main}"
 SOURCE="$(mktemp -d)"
-TMP_APP=$(mktemp --suffix=.plasmusic-toolbar)
+TMP_APP=$(mktemp --suffix=.plasmusic-toolbar-fork)
 
 trap 'rm -rf "$SOURCE" "$TMP_APP"' EXIT
 
@@ -12,7 +12,7 @@ echo "==> Cloning PlasMusic Toolbar ($BRANCH) ..."
 git clone --depth 1 --branch "$BRANCH" "$REPO" "$SOURCE" >/dev/null 2>&1
 
 echo "==> Installing widget ..."
-if kpackagetool6 -t Plasma/Applet -l 2>/dev/null | grep -q '^plasmusic-toolbar'; then
+if kpackagetool6 -t Plasma/Applet -l 2>/dev/null | grep -q '^plasmusic-toolbar-fork'; then
     kpackagetool6 -t Plasma/Applet -u "$SOURCE/src/"
 else
     kpackagetool6 -t Plasma/Applet -i "$SOURCE/src/"
