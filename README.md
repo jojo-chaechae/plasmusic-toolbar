@@ -40,6 +40,20 @@ Mini-lyrics are disabled by default and can be enabled in **Full View → Media 
 
 ## 📦 Installation
 
+### One-liner
+
+Installs (or upgrades) the widget and optionally restarts PlasmaShell:
+
+```sh
+bash <(curl -s https://raw.githubusercontent.com/jojo-chaechae/plasmusic-toolbar/main/install.sh)
+```
+
+To install from a specific branch:
+
+```sh
+PLASMUSIC_BRANCH=v4.3.1 bash <(curl -s https://raw.githubusercontent.com/jojo-chaechae/plasmusic-toolbar/main/install.sh)
+```
+
 ### KDE store
 
 The KDE Store listing is for the upstream project and does not include this fork's additional features:
