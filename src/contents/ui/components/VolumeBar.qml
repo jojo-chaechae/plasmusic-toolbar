@@ -6,8 +6,8 @@ import org.kde.kirigami as Kirigami
 Item {
     id: container
     property real volume: 0.5;
-    property real size: 3;
     property real iconSize: Kirigami.Units.iconSizes.small;
+    property color accentColor: Kirigami.Theme.highlightColor
     readonly property real minVolume: 0.0;
     readonly property real maxVolume: 1.0;
     readonly property real clampedVolume: clampVolume(volume);
@@ -37,18 +37,52 @@ Item {
             source: 'audio-volume-low';
         }
 
-        Rectangle {
+        PlasmaComponents3.Slider {
+            id: volumeSlider
+            Layout.fillWidth: true
+            from: container.minVolume
+            to: container.maxVolume
+            value: container.clampedVolume
+            Kirigami.Theme.highlightColor: container.accentColor
+
+            background: Rectangle {
+                x: volumeSlider.leftPadding
+                y: volumeSlider.topPadding + (volumeSlider.availableHeight - height) / 2
+                width: volumeSlider.availableWidth
+                height: 4
+                radius: height / 2
+                color: Qt.rgba(Kirigami.Theme.textColor.r,
+                               Kirigami.Theme.textColor.g,
+                               Kirigami.Theme.textColor.b, 0.25)
+
+                Rectangle {
+                    width: volumeSlider.visualPosition * parent.width
+                    height: parent.height
+                    radius: parent.radius
+                    color: container.accentColor
+                }
+            }
+
+            property bool changingVolume: false
+
+            onPressedChanged: () => {
+                if (!pressed) {
+                    volumeSlider.moved()
+                }
+            }
+            onMoved: {
+                if (pressed) {
+                    return
+                }
+
+                changingVolume = true
+                container.setVolume(container.clampVolume(value))
+                changingVolume = false
+            }
+
             MouseAreaWithWheelHandler {
-                anchors.centerIn: parent
-                height: parent.height + 8
-                width: parent.width
-                cursorShape: Qt.PointingHandCursor
-                onClicked: (mouse) => {
-                    container.setVolume(container.clampVolume(mouse.x / parent.width))
-                }
-                onPositionChanged: (mouse) => {
-                    if (pressed) container.setVolume(container.clampVolume(mouse.x / parent.width));
-                }
+                anchors.fill: parent
+                acceptedButtons: Qt.NoButton
                 onWheelUp: () => {
                     if (container.volume < container.maxVolume) container.volumeUp();
                 }
@@ -57,17 +91,6 @@ Item {
                 }
             }
 
-            height: container.size
-            Layout.fillWidth: true
-            id: full
-            color: Kirigami.Theme.disabledTextColor
-
-            Rectangle {
-                Layout.alignment: Qt.AlignLeft
-                height: container.size
-                width: full.width * clampedVolume;
-                color: Kirigami.Theme.highlightColor
-            }
         }
 
         CommandIcon {

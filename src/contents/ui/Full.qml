@@ -105,6 +105,30 @@ Item {
     // Store the original theme colors (root keeps default Kirigami.Theme.inherit: true)
     readonly property color _originalTextColor: Kirigami.Theme.textColor
     readonly property color _originalHighlightColor: Kirigami.Theme.highlightColor
+    readonly property color playbackAccentColor: imageColors.dominant.a > 0
+        ? imageColors.dominant : _originalHighlightColor
+
+    // Keep a color sampler alive even when album-art-as-background is disabled.
+    ImageWithPlaceholder {
+        id: albumColorSource
+        width: 1
+        height: 1
+        opacity: 0
+        placeholderSource: root.albumPlaceholder
+        imageSource: player.artUrl
+
+        onStatusChanged: {
+            if (status === Image.Ready) imageColors.update()
+        }
+    }
+
+    Kirigami.ImageColors {
+        id: imageColors
+        source: albumColorSource
+        readonly property color bgColor: average
+        readonly property color fgColor: Kirigami.ColorUtils.tintWithAlpha(bgColor, "white", .8)
+        readonly property color hlColor: Kirigami.ColorUtils.tintWithAlpha(bgColor, "white", .9)
+    }
 
     Item {
         visible: albumCoverBackground && thumbnailVisible
@@ -122,21 +146,6 @@ Item {
             fillMode: Image.PreserveAspectCrop
             placeholderSource: albumPlaceholder
             imageSource: player.artUrl
-
-            onStatusChanged: {
-                if (status === Image.Ready) {
-                    imageColors.update()
-                }
-            }
-
-            Kirigami.ImageColors {
-                id: imageColors
-                source: albumArtFull
-                readonly property color bgColor: average
-                // Text derived from the album is always bright for readability.
-                readonly property color fgColor: Kirigami.ColorUtils.tintWithAlpha(bgColor, "white", .8)
-                readonly property color hlColor: Kirigami.ColorUtils.tintWithAlpha(bgColor, "white", .9)
-            }
 
             layer.enabled: root.fullAlbumCoverRounded && root.albumCoverRadius > 0
 			layer.effect: OpacityMask {
@@ -324,6 +333,7 @@ Item {
         id: progressComponent
         TrackPositionSlider {
             visible: root.progressBarVisible
+            accentColor: root.playbackAccentColor
             songPosition: player.songPosition
             songLength: player.songLength
             playing: player.playbackStatus === Mpris.PlaybackStatus.Playing
@@ -341,6 +351,7 @@ Item {
         id: volumeComponent
         VolumeBar {
             visible: root.volumeControlVisible
+            accentColor: root.playbackAccentColor
             volume: player.volume
             onSetVolume: (vol) => {
                 player.setVolume(vol)

@@ -2,11 +2,13 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 import org.kde.plasma.components as PlasmaComponents3
 import org.kde.coreaddons 1.0 as KCoreAddons
+import org.kde.kirigami as Kirigami
 
 Item {
     property double songPosition: 0;  // Last song position detected in microseconds
     property double songLength: 0;  // Length of the entire song in microseconds;
     property bool playing: false;
+    property color accentColor: Kirigami.Theme.highlightColor
     property alias enableChangePosition: timeTrackSlider.enabled;
     property alias refreshInterval: timer.interval;
     signal requireChangePosition(position: double);
@@ -40,6 +42,25 @@ Item {
             Layout.fillWidth: true
             value: container.songPosition / container.songLength
             property bool changingPosition: false
+            Kirigami.Theme.highlightColor: container.accentColor
+
+            background: Rectangle {
+                x: timeTrackSlider.leftPadding
+                y: timeTrackSlider.topPadding + (timeTrackSlider.availableHeight - height) / 2
+                width: timeTrackSlider.availableWidth
+                height: 4
+                radius: height / 2
+                color: Qt.rgba(Kirigami.Theme.textColor.r,
+                               Kirigami.Theme.textColor.g,
+                               Kirigami.Theme.textColor.b, 0.25)
+
+                Rectangle {
+                    width: timeTrackSlider.visualPosition * parent.width
+                    height: parent.height
+                    radius: parent.radius
+                    color: container.accentColor
+                }
+            }
 
             onPressedChanged: () => {
                 if (!pressed) {
