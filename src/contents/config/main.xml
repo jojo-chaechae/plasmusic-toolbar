@@ -222,6 +222,9 @@
         <entry name="fullViewPlaybackScriptPath" type="String">
             <default></default>
         </entry>
+        <entry name="fullViewCopyTrackInfoButtonVisible" type="Bool">
+            <default>true</default>
+        </entry>
         <entry name="fullViewMediaPosition" type="Int">
             <default>0</default>
         </entry>

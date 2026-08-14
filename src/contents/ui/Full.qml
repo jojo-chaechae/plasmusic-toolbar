@@ -32,6 +32,7 @@ Item {
     property bool showPinButton: plasmoid.configuration.showPinButton
     property bool playbackScriptButtonEnabled: plasmoid.configuration.fullViewPlaybackScriptButtonEnabled
     property string playbackScriptPath: plasmoid.configuration.fullViewPlaybackScriptPath
+    property bool copyTrackInfoButtonVisible: plasmoid.configuration.fullViewCopyTrackInfoButtonVisible
     // Horizontal padding for the playback section components (text, slider, volume, controls).
     property int contentPadding: plasmoid.configuration.fullViewContentPadding
     property int contentVerticalPadding: plasmoid.configuration.fullViewContentPaddingVertical
@@ -340,6 +341,13 @@ Item {
                 albumCoverVisible: root.thumbnailVisible
                 scriptButtonEnabled: root.playbackScriptButtonEnabled
                 scriptPath: root.playbackScriptPath
+                copyTrackInfoVisible: root.copyTrackInfoButtonVisible
+                copyTrackInfo: {
+                    const parts = []
+                    if (player.artists) parts.push(player.artists)
+                    if (player.title) parts.push(player.title)
+                    return parts.join(" - ")
+                }
                 onKeepOpenToggled: widget.hideOnWindowDeactivate = !widget.hideOnWindowDeactivate
                 onAlbumCoverToggled: plasmoid.configuration.fullViewThumbnailVisible = !root.thumbnailVisible
                 onScriptRequested: scriptExecutor.run(root.playbackScriptPath)

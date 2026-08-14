@@ -60,6 +60,7 @@ KCM.SimpleKCM {
     property alias cfg_fullViewPlaybackSectionActionsVisible: fullViewPlaybackSectionActionsVisible.checked
     property alias cfg_fullViewPlaybackScriptButtonEnabled: fullViewPlaybackScriptButtonEnabled.checked
     property alias cfg_fullViewPlaybackScriptPath: fullViewPlaybackScriptPath.text
+    property alias cfg_fullViewCopyTrackInfoButtonVisible: fullViewCopyTrackInfoButtonVisible.checked
     property alias cfg_hideCanBeRaisedTooltip: hideCanBeRaisedTooltip.checked
 
     Kirigami.FormLayout {
@@ -348,6 +349,11 @@ KCM.SimpleKCM {
         CheckBox {
             id: fullViewPlaybackScriptButtonEnabled
             Kirigami.FormData.label: i18n("Show custom script button")
+        }
+
+        CheckBox {
+            id: fullViewCopyTrackInfoButtonVisible
+            Kirigami.FormData.label: i18n("Show copy track info button")
         }
 
         RowLayout {

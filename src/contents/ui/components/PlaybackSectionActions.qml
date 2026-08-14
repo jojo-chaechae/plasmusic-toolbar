@@ -11,6 +11,8 @@ Item {
     property bool albumCoverVisible: true
     property bool scriptButtonEnabled: false
     property string scriptPath: ""
+    property bool copyTrackInfoVisible: false
+    property string copyTrackInfo: ""
 
     signal keepOpenToggled()
     signal albumCoverToggled()
@@ -104,5 +106,34 @@ Item {
 
             onClicked: root.settingsRequested()
         }
+
+        PlasmaComponents3.ToolButton {
+            id: copyButton
+            visible: root.copyTrackInfoVisible
+            enabled: root.copyTrackInfo.trim().length > 0
+            implicitWidth: Kirigami.Units.iconSizes.medium
+            implicitHeight: Kirigami.Units.iconSizes.medium
+            display: PlasmaComponents3.AbstractButton.IconOnly
+            icon.name: "edit-copy"
+            text: i18n("Copy track info to clipboard")
+
+            PlasmaComponents3.ToolTip.text: text
+            PlasmaComponents3.ToolTip.visible: hovered || (activeFocus && (focusReason === Qt.TabFocusReason || focusReason === Qt.BacktabFocusReason))
+            Accessible.name: text
+
+            onClicked: {
+                clipboardField.text = root.copyTrackInfo
+                clipboardField.selectAll()
+                clipboardField.copy()
+            }
+        }
+    }
+
+    // Hidden field used to write the track info to the system clipboard.
+    PlasmaComponents3.TextField {
+        id: clipboardField
+        visible: false
+        width: 0
+        height: 0
     }
 }
