@@ -56,6 +56,7 @@ Item {
 
     property alias font: staticLabel.font
     property alias color: staticLabel.color
+    property alias horizontalAlignment: staticLabel.horizontalAlignment
     property string text: ""
     readonly property string spacing: "     "
     readonly property string textAndSpacing: root.text + root.spacing
@@ -100,6 +101,7 @@ Item {
         text: (root.overflowElides && !scrollingAnimation.running) ? elidedTextMetrics.elidedText : root.textAndSpacing
         color: staticLabel.color
         font: staticLabel.font
+        horizontalAlignment: staticLabel.horizontalAlignment
 
         NumberAnimation on x {
             id: scrollingAnimation

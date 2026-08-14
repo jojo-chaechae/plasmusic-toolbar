@@ -31,6 +31,8 @@ KCM.SimpleKCM {
     property alias cfg_fullViewShuffleVisible: fullViewShuffleVisible.checked
     property alias cfg_fullViewPlaybackControlsVisible: fullViewPlaybackControlsVisible.checked
     property alias cfg_fullViewLoopVisible: fullViewLoopVisible.checked
+    property alias cfg_fullViewLyricsVisible: fullViewLyricsVisible.checked
+    property alias cfg_fullViewLyricsLineCount: fullViewLyricsLineCount.value
     property alias cfg_fullViewPlaybackControlsFillWidth: fullViewPlaybackControlsFillWidth.checked
     property alias cfg_fullViewSongTextVisible: fullViewSongTextVisible.checked
     property alias cfg_fullViewSongTextAlignment: fullViewSongTextAlignment.value
@@ -134,6 +136,20 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Show loop control")
         }
 
+        CheckBox {
+            id: fullViewLyricsVisible
+            Kirigami.FormData.label: i18n("Show mini-lyrics")
+        }
+
+        SpinBox {
+            id: fullViewLyricsLineCount
+            Kirigami.FormData.label: i18n("Mini-lyrics line count:")
+            enabled: fullViewLyricsVisible.checked
+            from: 1
+            to: 9
+            stepSize: 1
+        }
+
         RowLayout {
             Kirigami.FormData.label: i18n("Fill available space with playback controls")
             CheckBox {
@@ -197,6 +213,7 @@ KCM.SimpleKCM {
                 case "progress": return i18n("Progress bar");
                 case "volume": return i18n("Volume control");
                 case "controls": return i18n("Playback controls");
+                case "lyrics": return i18n("Mini-lyrics");
                 }
                 return key;
             }
@@ -207,6 +224,16 @@ KCM.SimpleKCM {
                 const keys = (verticalOrderValue || "").split(",");
                 for (let i = 0; i < keys.length; i++) {
                     if (keys[i]) orderModel.append({key: keys[i]});
+                }
+                if (orderModel.count > 0) {
+                    let hasLyrics = false;
+                    for (let i = 0; i < orderModel.count; i++) {
+                        if (orderModel.get(i).key === "lyrics") {
+                            hasLyrics = true;
+                            break;
+                        }
+                    }
+                    if (!hasLyrics) orderModel.append({key: "lyrics"});
                 }
                 updatingModel = false;
             }

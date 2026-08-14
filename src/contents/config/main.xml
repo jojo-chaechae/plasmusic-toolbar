@@ -168,6 +168,12 @@
         <entry name="fullViewLoopVisible" type="Bool">
             <default>true</default>
         </entry>
+        <entry name="fullViewLyricsVisible" type="Bool">
+            <default>false</default>
+        </entry>
+        <entry name="fullViewLyricsLineCount" type="Int">
+            <default>3</default>
+        </entry>
         <entry name="fullViewPlaybackControlsFillWidth" type="Bool">
             <default>true</default>
         </entry>
@@ -178,7 +184,7 @@
             <default>4</default>
         </entry>
         <entry name="fullViewVerticalOrder" type="String">
-            <default>song,progress,volume,controls</default>
+            <default>song,progress,volume,controls,lyrics</default>
         </entry>
         <entry name="fullViewMinWidth" type="Int">
             <default>100</default>

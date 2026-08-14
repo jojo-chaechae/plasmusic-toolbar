@@ -47,8 +47,24 @@ Item {
     property bool playbackControlsFitWidth: plasmoid.configuration.fullViewPlaybackControlsFillWidth
     property bool songTextVisible: plasmoid.configuration.fullViewSongTextVisible
     property int songTextAlignment: plasmoid.configuration.fullViewSongTextAlignment
-    // Vertical order of the content rows (any permutation of: song, progress, volume, controls)
-    readonly property var contentOrder: plasmoid.configuration.fullViewVerticalOrder.split(",")
+    property bool lyricsVisible: plasmoid.configuration.fullViewLyricsVisible
+    property int lyricsLineCount: plasmoid.configuration.fullViewLyricsLineCount
+    // Vertical order of the content rows (any permutation of: song, progress, volume, controls, lyrics)
+    readonly property var contentOrder: {
+        const order = plasmoid.configuration.fullViewVerticalOrder.split(",").filter(key => key)
+        if (!order.includes("lyrics")) order.push("lyrics")
+        return order
+    }
+
+    LyricsManager {
+        id: lyricsManager
+        enabled: root.lyricsVisible
+        title: player.title
+        artists: player.artists
+        album: player.album
+        songLength: player.songLength
+        songPosition: player.songPosition
+    }
 
     // The Full View max and min width is driven by config values. The window can be resized within these bounds; thumbnail and text adapt.
     readonly property int configMinWidth: plasmoid.configuration.fullViewMinWidth
@@ -372,6 +388,19 @@ Item {
     }
 
     Component {
+        id: lyricsComponent
+        MiniLyrics {
+            visible: root.lyricsVisible && lyricsManager.lines.length > 0
+            lines: lyricsManager.lines
+            currentLine: lyricsManager.currentLine
+            lineCount: root.lyricsLineCount
+            textFont: baseFont
+            textColor: root.useAlbumContrastText ? imageColors.fgColor : Kirigami.Theme.textColor
+            scrollingEnabled: widget.expanded
+        }
+    }
+
+    Component {
         id: controlsComponent
         Item {
             visible: root.shuffleVisible || root.playbackControlsVisible || root.loopVisible
@@ -454,6 +483,7 @@ Item {
         case "progress": return progressComponent;
         case "volume": return volumeComponent;
         case "controls": return controlsComponent;
+        case "lyrics": return lyricsComponent;
         }
         return null;
     }
