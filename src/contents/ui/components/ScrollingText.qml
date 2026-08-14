@@ -58,10 +58,13 @@ Item {
     property alias color: staticLabel.color
     property alias horizontalAlignment: staticLabel.horizontalAlignment
     property string text: ""
+    property int scrollDuration: 0
     readonly property string spacing: "     "
     readonly property string textAndSpacing: root.text + root.spacing
     property int speed: 5;
-    readonly property int duration: (25 * (11 - speed) + 25)* textAndSpacing.length;
+    readonly property int duration: root.scrollDuration > 0
+        ? root.scrollDuration
+        : (25 * (11 - speed) + 25) * textAndSpacing.length;
 
     clip: overflow
 
@@ -98,19 +101,19 @@ Item {
 
         visible: overflow && scrollingEnabled
 
-        text: (root.overflowElides && !scrollingAnimation.running) ? elidedTextMetrics.elidedText : root.textAndSpacing
+        text: (root.overflowElides && !scrollingAnimation.running) ? elidedTextMetrics.elidedText : root.text
         color: staticLabel.color
         font: staticLabel.font
-        horizontalAlignment: staticLabel.horizontalAlignment
+        horizontalAlignment: Text.AlignLeft
 
         NumberAnimation on x {
             id: scrollingAnimation
 
             running: false
             from: 0
-            to: -scrollingLabel.implicitWidth
+            to: Math.min(0, -(scrollingLabel.implicitWidth - root.width))
             duration: root.duration
-            loops: Animation.Infinite
+            loops: 1
 
             function updateState() {
                 const shouldRun = root.overflow && root.scrollingEnabled;
@@ -146,6 +149,10 @@ Item {
             function onScrollingEnabledChanged() {
                 scrollingAnimation.updateState();
             }
+            function onScrollDurationChanged() {
+                if (scrollingAnimation.running) scrollingAnimation.restart();
+                scrollingAnimation.updateState();
+            }
             function onPauseScrollingChanged() {
                 scrollingAnimation.updateState();
             }
@@ -159,13 +166,6 @@ Item {
             }
         }
 
-        PlasmaComponents3.Label {
-            visible: !root.overflowElides || scrollingAnimation.running
-            anchors.left: parent.right
-            color: scrollingLabel.color
-            font: scrollingLabel.font
-            text: scrollingLabel.text
-        }
     }
     layer.enabled: overflow && overflowFades
     layer.effect: OpacityMask {

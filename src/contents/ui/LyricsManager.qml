@@ -13,6 +13,8 @@ QtObject {
     // Public lyrics contract used by the mini-lyrics view.
     property var lines: []
     property int currentLine: -1
+    property int currentLineDuration: 0 // milliseconds until the next lyric line
+    property bool available: false
     property var _timedLines: []
 
     property bool loading: false
@@ -52,6 +54,8 @@ QtObject {
         lines = []
         _timedLines = []
         currentLine = -1
+        currentLineDuration = 0
+        available = false
         loading = true
         debounceTimer.restart()
     }
@@ -63,6 +67,8 @@ QtObject {
         lines = []
         _timedLines = []
         currentLine = -1
+        currentLineDuration = 0
+        available = false
         loading = false
     }
 
@@ -173,6 +179,7 @@ QtObject {
 
         _timedLines = parsed
         lines = parsed.map(line => line.text)
+        available = true
         loading = false
         syncPosition()
         return true
@@ -199,6 +206,7 @@ QtObject {
     function syncPosition() {
         if (!lines.length) {
             currentLine = -1
+            currentLineDuration = 0
             return
         }
         const position = songPosition / 1000
@@ -208,5 +216,17 @@ QtObject {
             index = i
         }
         currentLine = index
+
+        if (index < 0) {
+            currentLineDuration = 0
+            return
+        }
+
+        const currentTime = _timedLines[index].time
+        const nextTime = index + 1 < _timedLines.length
+            ? _timedLines[index + 1].time
+            : Math.round(songLength / 1000)
+        const duration = nextTime > currentTime ? nextTime - currentTime : 5000
+        currentLineDuration = Math.max(500, Math.min(60000, duration))
     }
 }

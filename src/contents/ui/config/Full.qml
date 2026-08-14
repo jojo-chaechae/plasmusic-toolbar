@@ -32,7 +32,8 @@ KCM.SimpleKCM {
     property alias cfg_fullViewPlaybackControlsVisible: fullViewPlaybackControlsVisible.checked
     property alias cfg_fullViewLoopVisible: fullViewLoopVisible.checked
     property alias cfg_fullViewLyricsVisible: fullViewLyricsVisible.checked
-    property alias cfg_fullViewLyricsLineCount: fullViewLyricsLineCount.value
+    property alias cfg_fullViewMediaPosition: fullViewMediaPosition.value
+    property alias cfg_fullViewMediaOrder: fullViewMediaOrder.value
     property alias cfg_fullViewPlaybackControlsFillWidth: fullViewPlaybackControlsFillWidth.checked
     property alias cfg_fullViewSongTextVisible: fullViewSongTextVisible.checked
     property alias cfg_fullViewSongTextAlignment: fullViewSongTextAlignment.value
@@ -45,10 +46,14 @@ KCM.SimpleKCM {
     property alias cfg_showPinButton: showPinButton.checked
     property alias cfg_fullAlbumCoverRounded: fullAlbumCoverRounded.checked
     property alias cfg_fullAlbumCoverRadius: fullAlbumCoverRadius.value
-    property alias cfg_fullAlbumCoverVerticalAlignment: albumCoverVerticalAlignment.value
-    property alias cfg_fullAlbumCoverPadding: fullAlbumCoverPadding.value
     property alias cfg_fullViewContentPadding: fullViewContentPadding.value
-    property alias cfg_fullViewContentPaddingBottom: fullViewContentPaddingBottom.value
+    property alias cfg_fullViewContentPaddingVertical: fullViewContentPaddingVertical.value
+    property alias cfg_fullViewContentSpacing: fullViewContentSpacing.value
+    property alias cfg_fullViewMediaPadding: fullViewMediaPadding.value
+    property alias cfg_fullViewMediaSpacing: fullViewMediaSpacing.value
+    property alias cfg_fullViewLyricsAlignment: fullViewLyricsAlignment.value
+    property alias cfg_fullViewLyricsFontSize: fullViewLyricsFontSize.value
+    property alias cfg_fullViewLyricsLineSpacing: fullViewLyricsLineSpacing.value
     property alias cfg_hideCanBeRaisedTooltip: hideCanBeRaisedTooltip.checked
 
     Kirigami.FormLayout {
@@ -56,12 +61,183 @@ KCM.SimpleKCM {
 
         Kirigami.Separator {
             Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18n("Layout")
+            Kirigami.FormData.label: i18n("Media")
         }
 
         CheckBox {
             id: fullViewThumbnailVisible
             Kirigami.FormData.label: i18n("Show album cover")
+        }
+
+        RowLayout {
+            Kirigami.FormData.label: i18n("Album placeholder:")
+
+            Button {
+                text: i18n("Choose…")
+                icon.name: "settings-configure"
+                onClicked: {
+                    albumPlaceholderDialog.open()
+                }
+            }
+
+            Button {
+                text: i18n("Clear")
+                icon.name: "edit-delete"
+                visible: albumPlaceholderDialog.value
+                onClicked: {
+                    albumPlaceholderDialog.value = ""
+                }
+            }
+        }
+
+        ColumnLayout {
+            anchors.horizontalCenter: parent.horizontalCenter
+            visible: albumPlaceholderDialog.value
+            Image {
+                Layout.preferredWidth: 200
+                Layout.preferredHeight: 200
+                Layout.alignment: Qt.AlignHCenter
+                source: albumPlaceholderDialog.value
+            }
+        }
+
+        CheckBox {
+            Kirigami.FormData.label: i18n("Round album cover")
+            id: fullAlbumCoverRounded
+        }
+
+        Slider {
+            Layout.preferredWidth: 10 * Kirigami.Units.gridUnit
+            enabled: fullAlbumCoverRounded.checked
+            id: fullAlbumCoverRadius
+            from: 2
+            to: 26
+            stepSize: 2
+            Kirigami.FormData.label: i18n("Album cover radius:")
+        }
+
+        SpinBox {
+            id: fullViewMediaPadding
+            Kirigami.FormData.label: i18n("Album art and lyrics padding:")
+            from: 0
+            to: 100
+            stepSize: 1
+        }
+
+        SpinBox {
+            id: fullViewMediaSpacing
+            Kirigami.FormData.label: i18n("Spacing between album art and lyrics:")
+            from: 0
+            to: 100
+            stepSize: 1
+        }
+
+        CheckBox {
+            id: fullViewLyricsVisible
+            Kirigami.FormData.label: i18n("Show mini-lyrics")
+        }
+
+        ButtonGroup {
+            id: fullViewLyricsAlignment
+            property int value: Qt.AlignHCenter
+        }
+
+        RadioButton {
+            Kirigami.FormData.label: i18n("Mini-lyrics alignment:")
+            text: i18n("Left")
+            checked: fullViewLyricsAlignment.value === Qt.AlignLeft
+            onCheckedChanged: {
+                if (checked) fullViewLyricsAlignment.value = Qt.AlignLeft
+            }
+            ButtonGroup.group: fullViewLyricsAlignment
+        }
+
+        RadioButton {
+            text: i18n("Center")
+            checked: fullViewLyricsAlignment.value === Qt.AlignHCenter
+            onCheckedChanged: {
+                if (checked) fullViewLyricsAlignment.value = Qt.AlignHCenter
+            }
+            ButtonGroup.group: fullViewLyricsAlignment
+        }
+
+        RadioButton {
+            text: i18n("Right")
+            checked: fullViewLyricsAlignment.value === Qt.AlignRight
+            onCheckedChanged: {
+                if (checked) fullViewLyricsAlignment.value = Qt.AlignRight
+            }
+            ButtonGroup.group: fullViewLyricsAlignment
+        }
+
+        SpinBox {
+            id: fullViewLyricsFontSize
+            Kirigami.FormData.label: i18n("Mini-lyrics font size (0 = default):")
+            from: 0
+            to: 72
+            stepSize: 1
+        }
+
+        Slider {
+            id: fullViewLyricsLineSpacing
+            Kirigami.FormData.label: i18n("Mini-lyrics line spacing:")
+            Layout.preferredWidth: 10 * Kirigami.Units.gridUnit
+            from: 1.0
+            to: 2.5
+            stepSize: 0.05
+        }
+
+        ButtonGroup {
+            id: fullViewMediaPosition
+            property int value: 0
+        }
+
+        RadioButton {
+            Kirigami.FormData.label: i18n("Album art and lyrics position:")
+            text: i18n("Above playback section")
+            checked: fullViewMediaPosition.value === 0
+            onCheckedChanged: {
+                if (checked) fullViewMediaPosition.value = 0
+            }
+            ButtonGroup.group: fullViewMediaPosition
+        }
+
+        RadioButton {
+            text: i18n("Below playback section")
+            checked: fullViewMediaPosition.value === 1
+            onCheckedChanged: {
+                if (checked) fullViewMediaPosition.value = 1
+            }
+            ButtonGroup.group: fullViewMediaPosition
+        }
+
+        ButtonGroup {
+            id: fullViewMediaOrder
+            property int value: 0
+        }
+
+        RadioButton {
+            Kirigami.FormData.label: i18n("Album art and lyrics order:")
+            text: i18n("Album art first")
+            checked: fullViewMediaOrder.value === 0
+            onCheckedChanged: {
+                if (checked) fullViewMediaOrder.value = 0
+            }
+            ButtonGroup.group: fullViewMediaOrder
+        }
+
+        RadioButton {
+            text: i18n("Lyrics first")
+            checked: fullViewMediaOrder.value === 1
+            onCheckedChanged: {
+                if (checked) fullViewMediaOrder.value = 1
+            }
+            ButtonGroup.group: fullViewMediaOrder
+        }
+
+        Kirigami.Separator {
+            Kirigami.FormData.isSection: true
+            Kirigami.FormData.label: i18n("Playback Section")
         }
 
         CheckBox {
@@ -136,20 +312,6 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Show loop control")
         }
 
-        CheckBox {
-            id: fullViewLyricsVisible
-            Kirigami.FormData.label: i18n("Show mini-lyrics")
-        }
-
-        SpinBox {
-            id: fullViewLyricsLineCount
-            Kirigami.FormData.label: i18n("Mini-lyrics line count:")
-            enabled: fullViewLyricsVisible.checked
-            from: 1
-            to: 9
-            stepSize: 1
-        }
-
         RowLayout {
             Kirigami.FormData.label: i18n("Fill available space with playback controls")
             CheckBox {
@@ -196,7 +358,7 @@ KCM.SimpleKCM {
 
         ColumnLayout {
             id: verticalOrderControl
-            Kirigami.FormData.label: i18n("Content order:")
+            Kirigami.FormData.label: i18n("Playback section order:")
             spacing: Kirigami.Units.smallSpacing
 
             property string verticalOrderValue: ""
@@ -213,7 +375,6 @@ KCM.SimpleKCM {
                 case "progress": return i18n("Progress bar");
                 case "volume": return i18n("Volume control");
                 case "controls": return i18n("Playback controls");
-                case "lyrics": return i18n("Mini-lyrics");
                 }
                 return key;
             }
@@ -223,17 +384,7 @@ KCM.SimpleKCM {
                 orderModel.clear();
                 const keys = (verticalOrderValue || "").split(",");
                 for (let i = 0; i < keys.length; i++) {
-                    if (keys[i]) orderModel.append({key: keys[i]});
-                }
-                if (orderModel.count > 0) {
-                    let hasLyrics = false;
-                    for (let i = 0; i < orderModel.count; i++) {
-                        if (orderModel.get(i).key === "lyrics") {
-                            hasLyrics = true;
-                            break;
-                        }
-                    }
-                    if (!hasLyrics) orderModel.append({key: "lyrics"});
+                    if (keys[i] && keys[i] !== "lyrics") orderModel.append({key: keys[i]});
                 }
                 updatingModel = false;
             }
@@ -311,119 +462,28 @@ KCM.SimpleKCM {
             id: showPinButton
         }
 
-        Kirigami.Separator {
-            Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18n("Album cover")
-        }
-
-        RowLayout {
-            Kirigami.FormData.label: i18n("Album placeholder:")
-
-            Button {
-                text: i18n("Choose…")
-                icon.name: "settings-configure"
-                onClicked: {
-                    albumPlaceholderDialog.open()
-                }
-            }
-
-            Button {
-                text: i18n("Clear")
-                icon.name: "edit-delete"
-                visible: albumPlaceholderDialog.value
-                onClicked: {
-                    albumPlaceholderDialog.value = ""
-                }
-            }
-        }
-
-        ColumnLayout {
-            anchors.horizontalCenter: parent.horizontalCenter
-            visible: albumPlaceholderDialog.value
-            Image {
-                Layout.preferredWidth: 200
-                Layout.preferredHeight: 200
-                Layout.alignment: Qt.AlignHCenter
-                source: albumPlaceholderDialog.value
-            }
-        }
-
-        CheckBox {
-            Kirigami.FormData.label: i18n("Round album cover")
-            id: fullAlbumCoverRounded
-        }
-
-        Slider {
-            Layout.preferredWidth: 10 * Kirigami.Units.gridUnit
-            enabled: fullAlbumCoverRounded.checked
-            id: fullAlbumCoverRadius
-            from: 2
-            to: 26
-            stepSize: 2
-            Kirigami.FormData.label: i18n("Album cover radius:")
-        }
-
-        ButtonGroup {
-            id: albumCoverVerticalAlignment
-            property int value: Full.AlbumCoverAlignment.Middle
-        }
-
-        RadioButton {
-            Kirigami.FormData.label: i18n("Album cover vertical alignment:")
-            text: i18n("Top")
-            checked: albumCoverVerticalAlignment.value == Full.AlbumCoverAlignment.Top
-            onCheckedChanged: () => {
-                if (checked) {
-                    albumCoverVerticalAlignment.value = Full.AlbumCoverAlignment.Top
-                }
-            }
-            ButtonGroup.group: albumCoverVerticalAlignment
-        }
-
-        RadioButton {
-            text: i18n("Middle")
-            checked: albumCoverVerticalAlignment.value == Full.AlbumCoverAlignment.Middle
-            onCheckedChanged: () => {
-                if (checked) {
-                    albumCoverVerticalAlignment.value = Full.AlbumCoverAlignment.Middle
-                }
-            }
-            ButtonGroup.group: albumCoverVerticalAlignment
-        }
-
-        RadioButton {
-            text: i18n("Bottom")
-            checked: albumCoverVerticalAlignment.value == Full.AlbumCoverAlignment.Bottom
-            onCheckedChanged: () => {
-                if (checked) {
-                    albumCoverVerticalAlignment.value = Full.AlbumCoverAlignment.Bottom
-                }
-            }
-            ButtonGroup.group: albumCoverVerticalAlignment
-        }
-
-        SpinBox {
-            id: fullAlbumCoverPadding
-            Kirigami.FormData.label: i18n("Album cover padding:")
-            from: 0
-            to: 50
-            stepSize: 2
-        }
-
         SpinBox {
             id: fullViewContentPadding
-            Kirigami.FormData.label: i18n("Content padding:")
+            Kirigami.FormData.label: i18n("Playback section side padding:")
             from: 0
             to: 50
             stepSize: 2
         }
 
         SpinBox {
-            id: fullViewContentPaddingBottom
-            Kirigami.FormData.label: i18n("Content bottom padding:")
+            id: fullViewContentPaddingVertical
+            Kirigami.FormData.label: i18n("Playback section vertical padding:")
             from: 0
             to: 50
             stepSize: 2
+        }
+
+        SpinBox {
+            id: fullViewContentSpacing
+            Kirigami.FormData.label: i18n("Vertical spacing in playback section:")
+            from: 0
+            to: 50
+            stepSize: 1
         }
 
         Kirigami.Separator {

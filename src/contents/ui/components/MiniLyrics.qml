@@ -7,45 +7,78 @@ Item {
 
     property var lines: []
     property int currentLine: -1
-    property int lineCount: 3
+    property int currentLineDuration: 0
     property font textFont: Kirigami.Theme.defaultFont
     property color textColor: Kirigami.Theme.textColor
     property bool scrollingEnabled: true
-    property real lineHeight: Math.max(Kirigami.Units.gridUnit, textFont.pixelSize * 1.35)
+    property int horizontalAlignment: Qt.AlignHCenter
+    property int fontSize: 0
+    property real lineSpacing: 1.35
+    readonly property font lyricFont: {
+        if (fontSize <= 0) return textFont
+        let font = textFont
+        font.pointSize = -1
+        font.pixelSize = fontSize
+        return font
+    }
+    property real lineHeight: Math.max(Kirigami.Units.gridUnit, lyricFont.pixelSize * lineSpacing)
 
     visible: lines.length > 0
-    implicitHeight: lineCount * lineHeight
+    implicitHeight: lineHeight
     Layout.fillWidth: true
+    anchors.fill: parent
 
-    readonly property int firstLine: {
-        if (lines.length <= lineCount) return 0
-        const centered = currentLine - Math.floor(lineCount / 2)
-        return Math.max(0, Math.min(centered, lines.length - lineCount))
+    readonly property int visibleLineCount: Math.max(1, Math.floor(height / lineHeight))
+
+    function centerCurrentLine() {
+        if (currentLine < 0 || !lines.length) return
+
+        const target = currentLine * lineHeight - (height - lineHeight) / 2
+        flickable.contentY = Math.max(0, Math.min(target, flickable.contentHeight - height))
     }
 
-    ColumnLayout {
+    Flickable {
+        id: flickable
         anchors.fill: parent
-        spacing: 0
+        clip: true
+        interactive: contentHeight > height
+        boundsBehavior: Flickable.StopAtBounds
+        contentWidth: width
+        contentHeight: lyricsColumn.height
 
-        Repeater {
-            model: root.lineCount
-            delegate: ScrollingText {
-                required property int index
-                readonly property int lineIndex: root.firstLine + index
-                readonly property bool active: lineIndex === root.currentLine
+        Column {
+            id: lyricsColumn
+            width: flickable.width
+            height: root.lines.length * root.lineHeight
 
-                Layout.fillWidth: true
-                Layout.preferredHeight: root.lineHeight
-                maxWidth: root.width
-                text: lineIndex >= 0 && lineIndex < root.lines.length ? root.lines[lineIndex] : ""
-                font: active
-                    ? Qt.font(Object.assign({}, root.textFont, {weight: Font.Bold}))
-                    : root.textFont
-                color: root.textColor
-                speed: plasmoid.configuration.fullViewTextScrollingSpeed
-                scrollingEnabled: root.scrollingEnabled
-                opacity: active ? 1.0 : (lineIndex < root.currentLine ? 0.45 : 0.7)
+            Repeater {
+                model: root.lines
+                delegate: ScrollingText {
+                    required property int index
+                    required property string modelData
+                    readonly property bool active: index === root.currentLine
+
+                    width: flickable.width
+                    height: root.lineHeight
+                    maxWidth: flickable.width
+                    text: modelData
+                    font: {
+                        let font = root.lyricFont
+                        if (active) font.weight = Font.Bold
+                        return font
+                    }
+                    color: root.textColor
+                    speed: plasmoid.configuration.fullViewTextScrollingSpeed
+                    scrollingEnabled: root.scrollingEnabled && active
+                    scrollDuration: active ? root.currentLineDuration : 0
+                    horizontalAlignment: root.horizontalAlignment
+                    opacity: active ? 1.0 : (index < root.currentLine ? 0.45 : 0.7)
+                }
             }
         }
     }
+
+    onCurrentLineChanged: centerCurrentLine()
+    onHeightChanged: centerCurrentLine()
+    onLinesChanged: Qt.callLater(centerCurrentLine)
 }

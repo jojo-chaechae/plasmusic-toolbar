@@ -12,12 +12,6 @@ import Qt5Compat.GraphicalEffects
 Item {
     id: root
 
-    enum AlbumCoverAlignment {
-        Top,
-        Middle,
-        Bottom
-    }
-
     property string albumPlaceholder: plasmoid.configuration.albumPlaceholder
     property real volumeStep: plasmoid.configuration.volumeStep
     property bool albumCoverBackground: plasmoid.configuration.fullAlbumCoverAsBackground
@@ -34,11 +28,12 @@ Item {
     }
     property bool thumbnailVisible: plasmoid.configuration.fullViewThumbnailVisible
     property bool showPinButton: plasmoid.configuration.showPinButton
-    property int albumCoverVerticalAlignment: plasmoid.configuration.fullAlbumCoverVerticalAlignment
-    property int albumCoverPadding: plasmoid.configuration.fullAlbumCoverPadding
-    // Horizontal padding for the content components (text, slider, volume, controls).
+    // Horizontal padding for the playback section components (text, slider, volume, controls).
     property int contentPadding: plasmoid.configuration.fullViewContentPadding
-    property int contentBottomPadding: plasmoid.configuration.fullViewContentPaddingBottom
+    property int contentVerticalPadding: plasmoid.configuration.fullViewContentPaddingVertical
+    property int contentSpacing: plasmoid.configuration.fullViewContentSpacing
+    property int mediaPadding: plasmoid.configuration.fullViewMediaPadding
+    property int mediaSpacing: plasmoid.configuration.fullViewMediaSpacing
     property bool progressBarVisible: plasmoid.configuration.fullViewProgressBarVisible
     property bool volumeControlVisible: plasmoid.configuration.fullViewVolumeControlVisible
     property bool shuffleVisible: plasmoid.configuration.fullViewShuffleVisible
@@ -48,12 +43,14 @@ Item {
     property bool songTextVisible: plasmoid.configuration.fullViewSongTextVisible
     property int songTextAlignment: plasmoid.configuration.fullViewSongTextAlignment
     property bool lyricsVisible: plasmoid.configuration.fullViewLyricsVisible
-    property int lyricsLineCount: plasmoid.configuration.fullViewLyricsLineCount
-    // Vertical order of the content rows (any permutation of: song, progress, volume, controls, lyrics)
+    property int lyricsAlignment: plasmoid.configuration.fullViewLyricsAlignment
+    property int lyricsFontSize: plasmoid.configuration.fullViewLyricsFontSize
+    property real lyricsLineSpacing: plasmoid.configuration.fullViewLyricsLineSpacing
+    property int mediaPosition: plasmoid.configuration.fullViewMediaPosition
+    property int mediaOrder: plasmoid.configuration.fullViewMediaOrder
+    // Order of the playback section rows (any permutation of: song, progress, volume, controls)
     readonly property var contentOrder: {
-        const order = plasmoid.configuration.fullViewVerticalOrder.split(",").filter(key => key)
-        if (!order.includes("lyrics")) order.push("lyrics")
-        return order
+        return plasmoid.configuration.fullViewVerticalOrder.split(",").filter(key => key && key !== "lyrics")
     }
 
     LyricsManager {
@@ -82,9 +79,19 @@ Item {
 
     // Stable (width-independent) preferred thumbnail height, referenced to the min width, so that
     // resizing the popup width doesn't drag the height along with it (the "aspect ratio lock").
-    readonly property real naturalThumbHeight: thumbnailVisible && thumbnailContainer.imageRatio > 0
-        ? effectiveMinWidth / thumbnailContainer.imageRatio
+    readonly property real mediaImageRatio: mediaTop.item ? mediaTop.item.imageRatio
+        : mediaBottom.item ? mediaBottom.item.imageRatio : 1.0
+    readonly property real naturalThumbHeight: thumbnailVisible && mediaImageRatio > 0
+        ? effectiveMinWidth / mediaImageRatio
         : 0
+    // The media artwork follows the current popup width. naturalThumbHeight remains
+    // the width-independent floor used by the resize constraints below.
+    readonly property real mediaArtHeight: {
+        const mediaWidth = mediaPosition === 0 ? mediaTop.width : mediaBottom.width
+        return thumbnailVisible && mediaImageRatio > 0 && mediaWidth > 0
+            ? mediaWidth / mediaImageRatio
+            : naturalThumbHeight
+    }
     // Height floor that keeps the fixed content (everything except the flexible thumbnail) from clipping.
     readonly property real fixedContentHeight: Math.max(0, column.implicitHeight - naturalThumbHeight)
 
@@ -185,7 +192,7 @@ Item {
     ColumnLayout {
         id: column
 
-        spacing: 0
+        spacing: root.contentSpacing
         anchors.fill: parent
 
         // Override theme ONLY for this layout and its children
@@ -242,95 +249,55 @@ Item {
             }
         }
 
-        Rectangle {
-            id: thumbnailContainer
-            visible: thumbnailVisible
+        Loader {
+            id: mediaTop
+            visible: root.mediaPosition === 0
             Layout.fillWidth: true
             Layout.fillHeight: true
-            Layout.margins: 10
+            Layout.leftMargin: root.mediaPadding
+            Layout.rightMargin: root.mediaPadding
+            Layout.topMargin: root.mediaPadding
+            Layout.bottomMargin: root.mediaPadding
             Layout.minimumHeight: 0
-            // Use the actual image aspect ratio, fallback to square if not loaded yet
-            readonly property real imageRatio: albumArtNormal.implicitWidth > 0 && albumArtNormal.implicitHeight > 0
-                ? albumArtNormal.implicitWidth / albumArtNormal.implicitHeight
-                : 1.0
-            // Preferred height is stable (not tied to the current width) so the popup height
-            // stays independent of the width. Extra vertical space is absorbed here.
-            Layout.preferredHeight: root.naturalThumbHeight
-            color: 'transparent'
-
-            PlasmaComponents3.ToolTip {
-                id: raisePlayerTooltip
-                anchors.centerIn: parent
-                text: player.canRaise ? i18n("Bring player to the front") : i18n("This player can't be raised")
-                visible: !plasmoid.configuration.hideCanBeRaisedTooltip && coverMouseArea.containsMouse
-            }
-
-            MouseArea {
-                id: coverMouseArea
-                anchors.fill: parent
-                cursorShape: player.canRaise ? Qt.PointingHandCursor : Qt.ArrowCursor
-                onClicked: {
-                    if (player.canRaise) player.raise()
-                }
-                hoverEnabled: true
-            }
-
-            ImageWithPlaceholder {
-                visible: !albumCoverBackground
-                id: albumArtNormal
-                anchors.horizontalCenter: parent.horizontalCenter
-                readonly property real padding: root.albumCoverPadding
-                readonly property real availWidth: Math.max(0, thumbnailContainer.width - 2 * padding)
-                readonly property real availHeight: Math.max(0, thumbnailContainer.height - 2 * padding)
-                // Fit the artwork to the padded container while honoring the chosen vertical alignment.
-                readonly property real fittedWidth: availWidth > 0
-                    ? Math.min(availWidth, availHeight * thumbnailContainer.imageRatio)
-                    : 0
-                readonly property real fittedHeight: availHeight > 0
-                    ? Math.min(availHeight, availWidth / thumbnailContainer.imageRatio)
-                    : 0
-                width: fittedWidth
-                height: fittedHeight
-                y: root.albumCoverVerticalAlignment === Full.AlbumCoverAlignment.Top
-                    ? padding
-                    : root.albumCoverVerticalAlignment === Full.AlbumCoverAlignment.Bottom
-                        ? thumbnailContainer.height - padding - height
-                        : padding + (availHeight - height) / 2
-                fillMode: Image.PreserveAspectFit
-
-                placeholderSource: albumPlaceholder
-                imageSource: player.artUrl
-
-                layer.enabled: root.fullAlbumCoverRounded && root.albumCoverRadius > 0
-                layer.effect: OpacityMask {
-					maskSource: Item {
-						width: albumArtNormal.width
-						height: albumArtNormal.height
-						Rectangle {
-							anchors.fill: parent
-							radius: albumCoverRadius
-						}
-					}
-				}
-            }
+            Layout.preferredHeight: item ? item.implicitHeight : 0
+            sourceComponent: root.mediaPosition === 0 ? mediaComponent : null
         }
 
-        Repeater {
-            model: root.contentOrder
-            delegate: Loader {
-                visible: item ? item.visible : true
-                Layout.fillWidth: true
-                Layout.leftMargin: root.contentPadding
-                Layout.rightMargin: root.contentPadding
-                Layout.topMargin: modelData === "song" ? 5 : modelData === "volume" ? 10 : 0
-                sourceComponent: root.contentComponent(modelData)
-            }
-        }
-
-        // Bottom padding for the content
-        Item {
+        ColumnLayout {
+            id: contentColumn
             Layout.fillWidth: true
-            Layout.preferredHeight: root.contentBottomPadding
+            Layout.topMargin: root.contentVerticalPadding
+            Layout.bottomMargin: root.contentVerticalPadding
+            Layout.preferredHeight: implicitHeight
+            Layout.minimumHeight: implicitHeight
+            Layout.maximumHeight: implicitHeight
+            spacing: root.contentSpacing
+
+            Repeater {
+                model: root.contentOrder
+                delegate: Loader {
+                    visible: root.contentItemVisible(modelData)
+                    Layout.fillWidth: true
+                    Layout.leftMargin: root.contentPadding
+                    Layout.rightMargin: root.contentPadding
+                    Layout.preferredHeight: visible && item ? item.implicitHeight : 0
+                    sourceComponent: root.contentComponent(modelData)
+                }
+            }
+        }
+
+        Loader {
+            id: mediaBottom
+            visible: root.mediaPosition === 1
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            Layout.leftMargin: root.mediaPadding
+            Layout.rightMargin: root.mediaPadding
+            Layout.topMargin: root.mediaPadding
+            Layout.bottomMargin: root.mediaPadding
+            Layout.minimumHeight: 0
+            Layout.preferredHeight: item ? item.implicitHeight : 0
+            sourceComponent: root.mediaPosition === 1 ? mediaComponent : null
         }
 
     }
@@ -388,15 +355,33 @@ Item {
     }
 
     Component {
-        id: lyricsComponent
-        MiniLyrics {
-            visible: root.lyricsVisible && lyricsManager.lines.length > 0
-            lines: lyricsManager.lines
+        id: mediaComponent
+        MediaContent {
+            albumPlaceholder: root.albumPlaceholder
+            artUrl: player.artUrl
+            albumArtVisible: root.thumbnailVisible
+            albumCoverBackground: root.albumCoverBackground
+            albumCoverRounded: root.fullAlbumCoverRounded
+            albumCoverRadius: root.albumCoverRadius
+            albumArtHeight: root.mediaArtHeight
+            canRaise: player.canRaise
+            hideRaiseTooltip: plasmoid.configuration.hideCanBeRaisedTooltip
+            lyricsVisible: root.lyricsVisible
+            lyricsLines: lyricsManager.lines
+            lyricsAvailable: lyricsManager.available
             currentLine: lyricsManager.currentLine
-            lineCount: root.lyricsLineCount
+            currentLineDuration: lyricsManager.currentLineDuration
+            lyricsAlignment: root.lyricsAlignment
+            lyricsFontSize: root.lyricsFontSize
+            lyricsLineSpacing: root.lyricsLineSpacing
+            mediaSpacing: root.mediaSpacing
             textFont: baseFont
-            textColor: root.useAlbumContrastText ? imageColors.fgColor : Kirigami.Theme.textColor
+            lyricsTextColor: root.useAlbumContrastText ? imageColors.fgColor : Kirigami.Theme.textColor
             scrollingEnabled: widget.expanded
+            mediaOrder: root.mediaOrder
+            onRaiseRequested: {
+                if (player.canRaise) player.raise()
+            }
         }
     }
 
@@ -483,9 +468,18 @@ Item {
         case "progress": return progressComponent;
         case "volume": return volumeComponent;
         case "controls": return controlsComponent;
-        case "lyrics": return lyricsComponent;
         }
         return null;
+    }
+
+    function contentItemVisible(key) {
+        switch (key) {
+        case "song": return root.songTextVisible;
+        case "progress": return root.progressBarVisible;
+        case "volume": return root.volumeControlVisible;
+        case "controls": return root.shuffleVisible || root.playbackControlsVisible || root.loopVisible;
+        }
+        return false;
     }
 
     // Pin / keep-open button. When pinned the popup stays open on deactivation.
