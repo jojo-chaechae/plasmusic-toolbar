@@ -2,10 +2,8 @@
 
 # PlasMusic Toolbar
 
-[![Store version](https://img.shields.io/badge/dynamic/xml?url=https%3A%2F%2Fapi.opendesktop.org%2Focs%2Fv1%2Fcontent%2Fdata%2F2128143&query=%2Focs%2Fdata%2Fcontent%2Fversion%2Ftext()&color=1f425f&labelColor=2d333b&logo=kde&label=KDE%20Store)](https://store.kde.org/p/2128143)
 
-
-PlasMusic Toolbar is a KDE Plasma widget that shows the current playback information and provides basic playback controls.
+PlasMusic Toolbar is a KDE Plasma widget that shows current playback information and provides playback controls. This fork contains additional Full View media and synced-lyrics features maintained independently from upstream.
 
 </div>
 
@@ -21,18 +19,30 @@ PlasMusic Toolbar is a KDE Plasma widget that shows the current playback informa
 - **🎵 Now Playing** — Title, artist and album art shown right in the KDE panel.
 - **⏯️ Playback Controls** — Play, pause, skip and go back without leaving the panel.
 - **📸 Full View** — Popup with album art, full playback controls (shuffle, repeat included), volume and seek bar.
+- **🎼 Synced Mini-Lyrics** — Optional LRCLIB-backed lyrics with clickable timestamp seeking, horizontal overflow scrolling, configurable intermission markers, and experimental glow animation.
+- **🖼️ Combined Media View** — Configure album art and mini-lyrics together, including their order, position above or below playback controls, spacing, padding, and album-art visibility.
 - **🔀 Preferred Source** — Choose which media player the widget should follow.
 - **🖥️ Flexible Layout** — Works in horizontal and vertical panels, and as a desktop widget.
-- **🎨 Deep Customization** — Icon, album cover, fonts, panel visibility of icon/text/controls, scrolling text behavior, and more.
+- **🎨 Deep Customization** — Album-art-derived slider colors, fonts, panel visibility, scrolling behavior, playback-section layout, keep-open behavior, and more.
 
 All media info (title, artist, cover art url, playback state) is read from your media player via **[MPRIS2](https://specifications.freedesktop.org/mpris-spec/latest/)**. The same interface is used to send playback and other commands back to the player.
+
+### Synced lyrics
+
+Mini-lyrics are disabled by default and can be enabled in **Full View → Media → Show mini-lyrics**. When enabled, the widget queries [LRCLIB](https://lrclib.net/) for synced lyrics using the current track metadata.
+
+- Click a lyric line to seek to its timestamp when the player supports seeking.
+- Long lyric lines can scroll horizontally while the active line is displayed.
+- Large timing gaps can be shown as a `♪` intermission row. The gap threshold is configurable in seconds.
+- The experimental animation selector currently provides `None` and `Glow sweep`.
+- Lyrics are unavailable when LRCLIB has no matching synced lyrics or network access is unavailable.
 
 
 ## 📦 Installation
 
 ### KDE store
 
-You can install the widget directly from the kde store:
+The KDE Store listing is for the upstream project and does not include this fork's additional features:
 
 - https://store.kde.org/p/2128143
 
@@ -40,7 +50,7 @@ You can install the widget directly from the kde store:
 ### Manual
 1. Clone the repository:
     ```sh
-    git clone https://github.com/ccatterina/plasmusic-toolbar.git /tmp/plasmusic-toolbar
+    git clone https://github.com/jojo-chaechae/plasmusic-toolbar.git /tmp/plasmusic-toolbar
     ```
 
 2. Install the widget:
@@ -55,61 +65,17 @@ You can install the widget directly from the kde store:
     kpackagetool6 -u /tmp/plasmusic-toolbar/src/ --type Plasma/Applet
     ```
 
-4. Removing the widget:
+4. Restart PlasmaShell after installation or an upgrade:
+
+    ```sh
+    plasmashell --replace
+    ```
+
+5. Removing the widget:
 
     ```sh
     kpackagetool6 -r plasmusic-toolbar --type Plasma/Applet
     ```
-
-
-### Unofficial packages
-
-#### AUR package
-
-⚠️ **Unofficial package** — Use at your own risk.
-
-**Maintainer**: [@D3SOX](https://www.github.com/D3SOX)
-
-For those using an Arch-based distribution, an AUR package is available:
- - https://aur.archlinux.org/packages/plasma6-applets-plasmusic-toolbar
-
-
-#### Nix package
-
-⚠️ **Unofficial package** — Use at your own risk.
-
-**Maintainer**: [@HeitorAugustoLN](https://github.com/HeitorAugustoLN)
-
-For those using NixOS or the nix package manager, a Nix package is available in nixpkgs.
-
-To install the widget use one of these methods:
-
-- NixOS
-
-  ```nix
-  environment.systemPackages = with pkgs; [
-    plasmusic-toolbar
-  ];
-  ```
-
-- [Home-manager](https://github.com/nix-community/home-manager)
-
-  ```nix
-  home.packages = with pkgs; [
-    plasmusic-toolbar
-  ];
-  ```
-
-- [Plasma-manager](https://github.com/nix-community/plasma-manager): If the widget gets added to a panel it will automatically be installed
-
-- Other distros using nix package manager
-
-  ```
-  # without flakes:
-  nix-env -iA nixpkgs.plasmusic-toolbar
-  # with flakes:
-  nix profile install nixpkgs#plasmusic-toolbar
-  ```
 
 
 ## 🌍 Translations
@@ -118,13 +84,4 @@ Want to help translate PlasMusic Toolbar into your language? See [TRANSLATIONS.m
 
 ## 🖼️ Screenshots
 
-<p align="center">
-  <img src="./screenshots/screenshot_dark.png" width="25%"/>
-  <img src="./screenshots/screenshot_light.png" width="25%"/>
-  <br>
-  <img src="./screenshots/screenshot_colors_1.png" width="25%" />
-  <img src="./screenshots/screenshot_colors_2.png" width="25%" />
-  <br>
-  <img src="./screenshots/screenshot_vertical_1.png" width="25%" />
-  <img src="./screenshots/screenshot_vertical_2.png" width="25%" />
-</p>
+TODO: Add updated screenshots for the fork's Full View media and mini-lyrics features.
