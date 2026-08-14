@@ -19,10 +19,13 @@ Item {
     property bool albumCoverRounded: true
     property int albumCoverRadius: 6
     property bool canRaise: false
+    property bool raiseOnAlbumArtClick: true
+    property bool canSeek: false
     property bool hideRaiseTooltip: false
 
     property bool lyricsVisible: false
     property var lyricsLines: []
+    property var lyricsTimestamps: []
     property bool lyricsAvailable: false
     property int currentLine: -1
     property int currentLineDuration: 0
@@ -30,12 +33,15 @@ Item {
     property int mediaSpacing: Kirigami.Units.smallSpacing
     property int lyricsFontSize: 0
     property real lyricsLineSpacing: 1.35
+    property int lyricsAnimation: 0
+    property color lyricsAnimationColor: Kirigami.Theme.highlightColor
     property font textFont: Kirigami.Theme.defaultFont
     property color lyricsTextColor: Kirigami.Theme.textColor
     property bool scrollingEnabled: true
     property int mediaOrder: MediaContent.MediaOrder.AlbumArtFirst
 
     signal raiseRequested()
+    signal seekRequested(timestamp: double)
 
     readonly property bool hasLyrics: lyricsVisible && lyricsAvailable
     readonly property bool hasMedia: albumArtVisible || hasLyrics
@@ -97,14 +103,15 @@ Item {
             PlasmaComponents3.ToolTip {
                 anchors.centerIn: parent
                 text: root.canRaise ? i18n("Bring player to the front") : i18n("This player can't be raised")
-                visible: !root.hideRaiseTooltip && coverMouseArea.containsMouse
+                visible: root.raiseOnAlbumArtClick && !root.hideRaiseTooltip && coverMouseArea.containsMouse
             }
 
             MouseArea {
                 id: coverMouseArea
                 anchors.fill: parent
-                cursorShape: root.canRaise ? Qt.PointingHandCursor : Qt.ArrowCursor
+                cursorShape: root.raiseOnAlbumArtClick && root.canRaise ? Qt.PointingHandCursor : Qt.ArrowCursor
                 hoverEnabled: true
+                enabled: root.raiseOnAlbumArtClick
                 onClicked: {
                     if (root.canRaise) root.raiseRequested()
                 }
@@ -156,14 +163,19 @@ Item {
         MiniLyrics {
             visible: root.hasLyrics
             lines: root.lyricsLines
+            lineTimestamps: root.lyricsTimestamps
             currentLine: root.currentLine
             currentLineDuration: root.currentLineDuration
             horizontalAlignment: root.lyricsAlignment
             fontSize: root.lyricsFontSize
             lineSpacing: root.lyricsLineSpacing
+            animationMode: root.lyricsAnimation
+            animationColor: root.lyricsAnimationColor
             textFont: root.textFont
             textColor: root.lyricsTextColor
             scrollingEnabled: root.scrollingEnabled
+            seekEnabled: root.canSeek
+            onSeekRequested: (timestamp) => root.seekRequested(timestamp)
         }
     }
 

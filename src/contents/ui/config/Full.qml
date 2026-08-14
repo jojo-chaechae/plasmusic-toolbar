@@ -26,6 +26,7 @@ KCM.SimpleKCM {
     property alias cfg_fullAlbumCoverTintUseContrastText: fullAlbumCoverTintUseContrastText.checked
     property alias cfg_fullHideAlbumForSingles: fullHideAlbumForSingles.checked
     property alias cfg_fullViewThumbnailVisible: fullViewThumbnailVisible.checked
+    property alias cfg_fullViewAlbumCoverClickToRaise: fullViewAlbumCoverClickToRaise.checked
     property alias cfg_fullViewProgressBarVisible: fullViewProgressBarVisible.checked
     property alias cfg_fullViewVolumeControlVisible: fullViewVolumeControlVisible.checked
     property alias cfg_fullViewShuffleVisible: fullViewShuffleVisible.checked
@@ -54,6 +55,8 @@ KCM.SimpleKCM {
     property alias cfg_fullViewLyricsAlignment: fullViewLyricsAlignment.value
     property alias cfg_fullViewLyricsFontSize: fullViewLyricsFontSize.value
     property alias cfg_fullViewLyricsLineSpacing: fullViewLyricsLineSpacing.value
+    property alias cfg_fullViewLyricsAnimation: fullViewLyricsAnimation.currentIndex
+    property alias cfg_fullViewLyricsIntermissionThreshold: fullViewLyricsIntermissionThreshold.value
     property alias cfg_hideCanBeRaisedTooltip: hideCanBeRaisedTooltip.checked
 
     Kirigami.FormLayout {
@@ -67,6 +70,11 @@ KCM.SimpleKCM {
         CheckBox {
             id: fullViewThumbnailVisible
             Kirigami.FormData.label: i18n("Show album cover")
+        }
+
+        CheckBox {
+            id: fullViewAlbumCoverClickToRaise
+            Kirigami.FormData.label: i18n("Click album cover to bring player to front")
         }
 
         RowLayout {
@@ -185,6 +193,23 @@ KCM.SimpleKCM {
             from: 1.0
             to: 2.5
             stepSize: 0.05
+        }
+
+        ComboBox {
+            id: fullViewLyricsAnimation
+            Kirigami.FormData.label: i18n("Mini-lyrics animation (experimental):")
+            model: [
+                i18n("None"),
+                i18n("Glow sweep")
+            ]
+        }
+
+        SpinBox {
+            id: fullViewLyricsIntermissionThreshold
+            Kirigami.FormData.label: i18n("Intermission threshold (seconds):")
+            from: 1
+            to: 30
+            stepSize: 1
         }
 
         ButtonGroup {
@@ -636,18 +661,13 @@ KCM.SimpleKCM {
             }
         }
 
-        Kirigami.Separator {
-            Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18n("Text scrolling")
-        }
-
         Slider {
             Layout.preferredWidth: 10 * Kirigami.Units.gridUnit
             id: fullViewTextScrollingSpeed
             from: 1
             to: 10
             stepSize: 1
-            Kirigami.FormData.label: i18n("Speed:")
+            Kirigami.FormData.label: i18n("Text scroll speed:")
         }
 
         Kirigami.Separator {

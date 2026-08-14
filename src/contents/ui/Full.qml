@@ -27,6 +27,7 @@ Item {
         return Qt.rgba(c.r, c.g, c.b, albumCoverTintOpacity);
     }
     property bool thumbnailVisible: plasmoid.configuration.fullViewThumbnailVisible
+    property bool albumCoverClickToRaise: plasmoid.configuration.fullViewAlbumCoverClickToRaise
     property bool showPinButton: plasmoid.configuration.showPinButton
     // Horizontal padding for the playback section components (text, slider, volume, controls).
     property int contentPadding: plasmoid.configuration.fullViewContentPadding
@@ -46,6 +47,8 @@ Item {
     property int lyricsAlignment: plasmoid.configuration.fullViewLyricsAlignment
     property int lyricsFontSize: plasmoid.configuration.fullViewLyricsFontSize
     property real lyricsLineSpacing: plasmoid.configuration.fullViewLyricsLineSpacing
+    property int lyricsAnimation: plasmoid.configuration.fullViewLyricsAnimation
+    property int lyricsIntermissionThreshold: plasmoid.configuration.fullViewLyricsIntermissionThreshold
     property int mediaPosition: plasmoid.configuration.fullViewMediaPosition
     property int mediaOrder: plasmoid.configuration.fullViewMediaOrder
     // Order of the playback section rows (any permutation of: song, progress, volume, controls)
@@ -56,6 +59,7 @@ Item {
     LyricsManager {
         id: lyricsManager
         enabled: root.lyricsVisible
+        intermissionThreshold: root.lyricsIntermissionThreshold
         title: player.title
         artists: player.artists
         album: player.album
@@ -376,22 +380,30 @@ Item {
             albumCoverRadius: root.albumCoverRadius
             albumArtHeight: root.mediaArtHeight
             canRaise: player.canRaise
+            raiseOnAlbumArtClick: root.albumCoverClickToRaise
             hideRaiseTooltip: plasmoid.configuration.hideCanBeRaisedTooltip
             lyricsVisible: root.lyricsVisible
             lyricsLines: lyricsManager.lines
+            lyricsTimestamps: lyricsManager.lineTimestamps
             lyricsAvailable: lyricsManager.available
             currentLine: lyricsManager.currentLine
             currentLineDuration: lyricsManager.currentLineDuration
             lyricsAlignment: root.lyricsAlignment
             lyricsFontSize: root.lyricsFontSize
             lyricsLineSpacing: root.lyricsLineSpacing
+            lyricsAnimation: root.lyricsAnimation
+            lyricsAnimationColor: imageColors.hlColor
             mediaSpacing: root.mediaSpacing
             textFont: baseFont
             lyricsTextColor: root.useAlbumContrastText ? imageColors.fgColor : Kirigami.Theme.textColor
             scrollingEnabled: widget.expanded
+            canSeek: player.canSeek
             mediaOrder: root.mediaOrder
             onRaiseRequested: {
                 if (player.canRaise) player.raise()
+            }
+            onSeekRequested: (timestamp) => {
+                if (player.canSeek) player.setPosition(timestamp * 1000)
             }
         }
     }
@@ -493,17 +505,33 @@ Item {
         return false;
     }
 
-    // Pin / keep-open button. When pinned the popup stays open on deactivation.
-    CommandIcon {
+    // Keep-open button. When checked the popup stays open on deactivation.
+    PlasmaComponents3.ToolButton {
         id: pinButton
         visible: root.showPinButton
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.topMargin: Kirigami.Units.smallSpacing
-        anchors.rightMargin: 20
-        size: Kirigami.Units.iconSizes.smallMedium
-        source: widget.hideOnWindowDeactivate ? "pin" : "window-pin"
-        active: !widget.hideOnWindowDeactivate
+        anchors.rightMargin: Kirigami.Units.smallSpacing
+        z: 100
+        implicitWidth: Kirigami.Units.iconSizes.medium
+        implicitHeight: Kirigami.Units.iconSizes.medium
+        display: PlasmaComponents3.AbstractButton.IconOnly
+        checkable: true
+        icon.name: "window-pin"
+        icon.color: checked ? Kirigami.Theme.highlightColor : Kirigami.Theme.textColor
+        text: checked ? i18n("Keep player open") : i18n("Allow player to close automatically")
+
+        Binding {
+            target: pinButton
+            property: "checked"
+            value: !widget.hideOnWindowDeactivate
+        }
+
+        PlasmaComponents3.ToolTip.text: text
+        PlasmaComponents3.ToolTip.visible: hovered || (activeFocus && (focusReason === Qt.TabFocusReason || focusReason === Qt.BacktabFocusReason))
+        Accessible.name: text
+
         onClicked: widget.hideOnWindowDeactivate = !widget.hideOnWindowDeactivate
     }
 }

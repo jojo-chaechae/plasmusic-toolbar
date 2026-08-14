@@ -12,10 +12,15 @@ QtObject {
 
     // Public lyrics contract used by the mini-lyrics view.
     property var lines: []
+    property var lineTimestamps: [] // milliseconds from the start of the track
     property int currentLine: -1
-    property int currentLineDuration: 0 // milliseconds until the next lyric line
+    property int currentLineDuration: 0 // active duration for the current lyric line, in milliseconds
+    property bool inBreak: false
+    property int intermissionThreshold: 6 // seconds
+    readonly property int breakThreshold: Math.max(1, intermissionThreshold) * 1000 // milliseconds
     property bool available: false
     property var _timedLines: []
+    property var _displayLineIndices: []
 
     property bool loading: false
     property string _lastQuery: ""
@@ -35,6 +40,12 @@ QtObject {
     onSongLengthChanged: _scheduleFetch()
     onSongPositionChanged: syncPosition()
     onLinesChanged: syncPosition()
+    onIntermissionThresholdChanged: {
+        if (_timedLines.length) {
+            _buildDisplayLines()
+            syncPosition()
+        }
+    }
 
     function _queryKey() {
         return JSON.stringify([title, artists, album, Math.round(songLength / 1000000)])
@@ -52,9 +63,12 @@ QtObject {
         _abortActiveRequest()
         _lastQuery = query
         lines = []
+        lineTimestamps = []
         _timedLines = []
+        _displayLineIndices = []
         currentLine = -1
         currentLineDuration = 0
+        inBreak = false
         available = false
         loading = true
         debounceTimer.restart()
@@ -65,9 +79,12 @@ QtObject {
         _abortActiveRequest()
         _lastQuery = ""
         lines = []
+        lineTimestamps = []
         _timedLines = []
+        _displayLineIndices = []
         currentLine = -1
         currentLineDuration = 0
+        inBreak = false
         available = false
         loading = false
     }
@@ -178,11 +195,30 @@ QtObject {
         if (parsed.length === 0) return false
 
         _timedLines = parsed
-        lines = parsed.map(line => line.text)
+        _buildDisplayLines()
         available = true
         loading = false
         syncPosition()
         return true
+    }
+
+    function _buildDisplayLines() {
+        const parsed = _timedLines
+        const displayLines = []
+        const displayTimestamps = []
+        const displayIndices = []
+        for (let i = 0; i < parsed.length; ++i) {
+            if (i > 0 && parsed[i].time - parsed[i - 1].time > root.breakThreshold) {
+                displayLines.push("♪")
+                displayTimestamps.push(-1)
+            }
+            displayIndices.push(displayLines.length)
+            displayLines.push(parsed[i].text)
+            displayTimestamps.push(parsed[i].time)
+        }
+        _displayLineIndices = displayIndices
+        lines = displayLines
+        lineTimestamps = displayTimestamps
     }
 
     function _parseLrc(lrc) {
@@ -207,6 +243,7 @@ QtObject {
         if (!lines.length) {
             currentLine = -1
             currentLineDuration = 0
+            inBreak = false
             return
         }
         const position = songPosition / 1000
@@ -215,10 +252,10 @@ QtObject {
             if (_timedLines[i].time > position) break
             index = i
         }
-        currentLine = index
-
         if (index < 0) {
+            currentLine = -1
             currentLineDuration = 0
+            inBreak = false
             return
         }
 
@@ -226,7 +263,19 @@ QtObject {
         const nextTime = index + 1 < _timedLines.length
             ? _timedLines[index + 1].time
             : Math.round(songLength / 1000)
-        const duration = nextTime > currentTime ? nextTime - currentTime : 5000
+        const gap = nextTime > currentTime ? nextTime - currentTime : 5000
+        const isBreak = gap > root.breakThreshold
+        const duration = isBreak ? root.breakThreshold : gap
+
+        if (isBreak && position >= currentTime + duration) {
+            currentLine = _displayLineIndices[index] + 1
+            currentLineDuration = 0
+            inBreak = true
+            return
+        }
+
+        currentLine = _displayLineIndices[index]
+        inBreak = false
         currentLineDuration = Math.max(500, Math.min(60000, duration))
     }
 }

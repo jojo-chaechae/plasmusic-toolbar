@@ -50,7 +50,7 @@ Item {
         id: imageComponent
         visible: type === PanelIcon.Type.Image
         anchors.fill: parent
-        sourceSize: Qt.size(root.implicitWidth * Screen.devicePixelRatio, root.implicitHeight * Screen.devicePixelRatio)
+        sourceSize: Qt.size(root.size * Screen.devicePixelRatio, root.size * Screen.devicePixelRatio)
         source: root.imageUrl
         fillMode: Image.PreserveAspectFit
         onStatusChanged: {
@@ -67,7 +67,7 @@ Item {
         // enables round corners while the radius is set
         // ref: https://stackoverflow.com/questions/6090740/image-rounded-corners-in-qml
         layer.enabled: imageRadius > 0
-        layer.textureSize: Qt.size(root.implicitWidth * Screen.devicePixelRatio, root.implicitHeight * Screen.devicePixelRatio)
+        layer.textureSize: Qt.size(root.size * Screen.devicePixelRatio, root.size * Screen.devicePixelRatio)
         layer.effect: OpacityMask {
             maskSource: Item {
                 width: imageComponent.width

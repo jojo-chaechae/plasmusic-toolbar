@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: plasmusic-toolbar\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-14 10:19+0600\n"
+"POT-Creation-Date: 2026-08-14 11:51+0600\n"
 "PO-Revision-Date: 2026-03-08 00:00+0300\n"
 "Last-Translator: A coffee lover\n"
 "Language-Team: none\n"
@@ -32,18 +32,28 @@ msgstr "Panel Görünümü"
 msgid "Full View"
 msgstr "Tam Görünüm"
 
-#: src/contents/ui/Full.qml:237
+#: src/contents/ui/Full.qml:250
 #, kde-format
 msgctxt "@action:button"
 msgid "Choose player automatically"
 msgstr ""
 
-#: src/contents/ui/components/MediaContent.qml:99
+#: src/contents/ui/Full.qml:523
+#, kde-format
+msgid "Allow player to close automatically"
+msgstr ""
+
+#: src/contents/ui/Full.qml:523
+#, kde-format
+msgid "Keep player open"
+msgstr ""
+
+#: src/contents/ui/components/MediaContent.qml:105
 #, kde-format
 msgid "Bring player to the front"
 msgstr "Oynatıcıyı öne getir"
 
-#: src/contents/ui/components/MediaContent.qml:99 src/contents/ui/main.qml:31
+#: src/contents/ui/components/MediaContent.qml:105 src/contents/ui/main.qml:31
 #, kde-format
 msgid "This player can't be raised"
 msgstr "Bu oynatıcı öne getirilemez"
@@ -71,7 +81,7 @@ msgstr ""
 "kontrolleri sağa (veya alta) hizalanır; şarkı metni kullanıcı tercihine göre "
 "konumlandırılabilir."
 
-#: src/contents/ui/config/Compact.qml:71 src/contents/ui/config/Full.qml:88
+#: src/contents/ui/config/Compact.qml:71 src/contents/ui/config/Full.qml:279
 #, kde-format
 msgid "Song text alignment:"
 msgstr "Şarkı metni hizalaması:"
@@ -81,8 +91,8 @@ msgstr "Şarkı metni hizalaması:"
 msgid "Left (Top for vertical panel)"
 msgstr "Sol (Dikey panel için üst)"
 
-#: src/contents/ui/config/Compact.qml:83 src/contents/ui/config/Full.qml:101
-#: src/contents/ui/config/Full.qml:187
+#: src/contents/ui/config/Compact.qml:83 src/contents/ui/config/Full.qml:164
+#: src/contents/ui/config/Full.qml:292
 #, kde-format
 msgid "Center"
 msgstr "Orta"
@@ -97,7 +107,7 @@ msgstr "Sağ (Dikey panel için alt)"
 msgid "Show icon:"
 msgstr "Simgeyi göster:"
 
-#: src/contents/ui/config/Compact.qml:111 src/contents/ui/config/Full.qml:126
+#: src/contents/ui/config/Compact.qml:111 src/contents/ui/config/Full.qml:317
 #, kde-format
 msgid "Show song text"
 msgstr "Şarkı metnini göster"
@@ -143,7 +153,7 @@ msgstr "Albüm kapağını simge olarak kullan"
 msgid "Fallback to icon if cover is not available"
 msgstr "Kapak yoksa yerine simgeyi kullan"
 
-#: src/contents/ui/config/Compact.qml:166 src/contents/ui/config/Full.qml:451
+#: src/contents/ui/config/Compact.qml:166 src/contents/ui/config/Full.qml:124
 #, kde-format
 msgid "Album cover radius:"
 msgstr "Albüm kapağı köşe yarıçapı:"
@@ -153,51 +163,51 @@ msgstr "Albüm kapağı köşe yarıçapı:"
 msgid "Song text customization"
 msgstr "Şarkı metni özelleştirme"
 
-#: src/contents/ui/config/Compact.qml:182 src/contents/ui/config/Full.qml:508
+#: src/contents/ui/config/Compact.qml:182 src/contents/ui/config/Full.qml:527
 #, kde-format
 msgid "Song title position:"
 msgstr "Şarkı adı konumu:"
 
 #: src/contents/ui/config/Compact.qml:183
 #: src/contents/ui/config/Compact.qml:230
-#: src/contents/ui/config/Compact.qml:275 src/contents/ui/config/Full.qml:509
-#: src/contents/ui/config/Full.qml:556 src/contents/ui/config/Full.qml:601
+#: src/contents/ui/config/Compact.qml:275 src/contents/ui/config/Full.qml:528
+#: src/contents/ui/config/Full.qml:575 src/contents/ui/config/Full.qml:620
 #, kde-format
 msgid "Hidden"
 msgstr "Gizli"
 
 #: src/contents/ui/config/Compact.qml:194
 #: src/contents/ui/config/Compact.qml:241
-#: src/contents/ui/config/Compact.qml:286 src/contents/ui/config/Full.qml:520
-#: src/contents/ui/config/Full.qml:567 src/contents/ui/config/Full.qml:612
+#: src/contents/ui/config/Compact.qml:286 src/contents/ui/config/Full.qml:539
+#: src/contents/ui/config/Full.qml:586 src/contents/ui/config/Full.qml:631
 #, kde-format
 msgid "First line"
 msgstr "İlk satır"
 
 #: src/contents/ui/config/Compact.qml:205
 #: src/contents/ui/config/Compact.qml:252
-#: src/contents/ui/config/Compact.qml:297 src/contents/ui/config/Full.qml:531
-#: src/contents/ui/config/Full.qml:578 src/contents/ui/config/Full.qml:623
+#: src/contents/ui/config/Compact.qml:297 src/contents/ui/config/Full.qml:550
+#: src/contents/ui/config/Full.qml:597 src/contents/ui/config/Full.qml:642
 #, kde-format
 msgid "Second line"
 msgstr "İkinci satır"
 
-#: src/contents/ui/config/Compact.qml:229 src/contents/ui/config/Full.qml:555
+#: src/contents/ui/config/Compact.qml:229 src/contents/ui/config/Full.qml:574
 #, kde-format
 msgid "Artists position:"
 msgstr "Sanatçıların konumu:"
 
-#: src/contents/ui/config/Compact.qml:274 src/contents/ui/config/Full.qml:600
+#: src/contents/ui/config/Compact.qml:274 src/contents/ui/config/Full.qml:619
 #, kde-format
 msgid "Album title position:"
 msgstr "Albüm adı konumu:"
 
-#: src/contents/ui/config/Compact.qml:308 src/contents/ui/config/Full.qml:634
+#: src/contents/ui/config/Compact.qml:308 src/contents/ui/config/Full.qml:653
 #, kde-format
 msgid "Hide album name for singles:"
 msgstr "Tekli parçalarda albüm adını gizle:"
 
-#: src/contents/ui/config/Compact.qml:314 src/contents/ui/config/Full.qml:640
+#: src/contents/ui/config/Compact.qml:314 src/contents/ui/config/Full.qml:659
 #, kde-format
 msgid ""
 "If the album name and the track title match, the album name will be hidden."
@@ -238,12 +248,12 @@ msgstr "Kısalt"
 msgid "Fade out"
 msgstr "Soldur"
 
-#: src/contents/ui/config/Compact.qml:384
+#: src/contents/ui/config/Compact.qml:384 src/contents/ui/config/Full.qml:202
 #, kde-format
 msgid "None"
 msgstr "Hiçbiri"
 
-#: src/contents/ui/config/Compact.qml:396 src/contents/ui/config/Full.qml:647
+#: src/contents/ui/config/Compact.qml:396
 #, kde-format
 msgid "Text scrolling"
 msgstr "Metin kaydırma"
@@ -253,7 +263,7 @@ msgstr "Metin kaydırma"
 msgid "Enabled"
 msgstr "Etkin"
 
-#: src/contents/ui/config/Compact.qml:410 src/contents/ui/config/Full.qml:656
+#: src/contents/ui/config/Compact.qml:410
 #, kde-format
 msgid "Speed:"
 msgstr "Hız:"
@@ -298,7 +308,7 @@ msgstr "Oynatma kontrolleri özelleştirme"
 msgid "Space between controls"
 msgstr "Kontroller arası boşluk"
 
-#: src/contents/ui/config/Compact.qml:490 src/contents/ui/config/Full.qml:661
+#: src/contents/ui/config/Compact.qml:490 src/contents/ui/config/Full.qml:675
 #, kde-format
 msgid "Background"
 msgstr "Arka plan"
@@ -325,7 +335,7 @@ msgstr ""
 msgid "Background radius:"
 msgstr "Arka plan köşe yarıçapı:"
 
-#: src/contents/ui/config/Compact.qml:523 src/contents/ui/config/Full.qml:751
+#: src/contents/ui/config/Compact.qml:523 src/contents/ui/config/Full.qml:765
 #, kde-format
 msgid "Hover tooltip"
 msgstr ""
@@ -347,112 +357,162 @@ msgctxt "@item:inmenu Reset icon to default"
 msgid "Clear Icon"
 msgstr "Simgeyi Temizle"
 
-#: src/contents/ui/config/Full.qml:64
+#: src/contents/ui/config/Full.qml:67
 #, kde-format
 msgid "Media"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:69
+#: src/contents/ui/config/Full.qml:72
 #, kde-format
 msgid "Show album cover"
 msgstr "Albüm kapağını göster"
 
-#: src/contents/ui/config/Full.qml:74
+#: src/contents/ui/config/Full.qml:77
 #, kde-format
-msgid "Playback Section"
+msgid "Click album cover to bring player to front"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:79
+#: src/contents/ui/config/Full.qml:81
 #, kde-format
-msgid "Show progress bar"
-msgstr "İlerleme çubuğunu göster"
+msgid "Album placeholder:"
+msgstr "Albüm yer tutucusu:"
 
-#: src/contents/ui/config/Full.qml:89 src/contents/ui/config/Full.qml:161
+#: src/contents/ui/config/Full.qml:84 src/contents/ui/config/General.qml:127
 #, kde-format
-msgid "Left"
-msgstr "Sol"
+msgid "Choose…"
+msgstr "Seç…"
 
-#: src/contents/ui/config/Full.qml:113 src/contents/ui/config/Full.qml:196
+#: src/contents/ui/config/Full.qml:92
 #, kde-format
-msgid "Right"
-msgstr "Sağ"
+msgid "Clear"
+msgstr "Temizle"
 
-#: src/contents/ui/config/Full.qml:131
+#: src/contents/ui/config/Full.qml:113
 #, kde-format
-msgid "Show volume control"
-msgstr "Ses düzeyi kontrolünü göster"
+msgid "Round album cover"
+msgstr "Yuvarlak albüm kapağı"
 
-#: src/contents/ui/config/Full.qml:136
+#: src/contents/ui/config/Full.qml:129
 #, kde-format
-msgid "Show shuffle control"
-msgstr "Karıştırma kontrolünü göster"
+msgid "Album art and lyrics padding:"
+msgstr ""
 
-#: src/contents/ui/config/Full.qml:141
+#: src/contents/ui/config/Full.qml:137
 #, kde-format
-msgid "Show playback controls"
-msgstr "Oynatma kontrollerini göster"
+msgid "Spacing between album art and lyrics:"
+msgstr ""
 
-#: src/contents/ui/config/Full.qml:146
-#, kde-format
-msgid "Show loop control"
-msgstr "Döngü kontrolünü göster"
-
-#: src/contents/ui/config/Full.qml:151
+#: src/contents/ui/config/Full.qml:145
 #, kde-format
 msgid "Show mini-lyrics"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:160
+#: src/contents/ui/config/Full.qml:154
 #, kde-format
 msgid "Mini-lyrics alignment:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:171
+#: src/contents/ui/config/Full.qml:155 src/contents/ui/config/Full.qml:280
+#, kde-format
+msgid "Left"
+msgstr "Sol"
+
+#: src/contents/ui/config/Full.qml:173 src/contents/ui/config/Full.qml:304
+#, kde-format
+msgid "Right"
+msgstr "Sağ"
+
+#: src/contents/ui/config/Full.qml:183
 #, kde-format
 msgid "Mini-lyrics font size (0 = default):"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:179
+#: src/contents/ui/config/Full.qml:191
 #, kde-format
 msgid "Mini-lyrics line spacing:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:210
+#: src/contents/ui/config/Full.qml:200
+#, kde-format
+msgid "Mini-lyrics animation (experimental):"
+msgstr ""
+
+#: src/contents/ui/config/Full.qml:203
+#, kde-format
+msgid "Glow sweep"
+msgstr ""
+
+#: src/contents/ui/config/Full.qml:209
+#, kde-format
+msgid "Intermission threshold (seconds):"
+msgstr ""
+
+#: src/contents/ui/config/Full.qml:221
 #, kde-format
 msgid "Album art and lyrics position:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:211
+#: src/contents/ui/config/Full.qml:222
 #, kde-format
 msgid "Above playback section"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:220
+#: src/contents/ui/config/Full.qml:231
 #, kde-format
 msgid "Below playback section"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:234
+#: src/contents/ui/config/Full.qml:245
 #, kde-format
 msgid "Album art and lyrics order:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:235
+#: src/contents/ui/config/Full.qml:246
 #, kde-format
 msgid "Album art first"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:244
+#: src/contents/ui/config/Full.qml:255
 #, kde-format
 msgid "Lyrics first"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:253
+#: src/contents/ui/config/Full.qml:265
+#, kde-format
+msgid "Playback Section"
+msgstr ""
+
+#: src/contents/ui/config/Full.qml:270
+#, kde-format
+msgid "Show progress bar"
+msgstr "İlerleme çubuğunu göster"
+
+#: src/contents/ui/config/Full.qml:322
+#, kde-format
+msgid "Show volume control"
+msgstr "Ses düzeyi kontrolünü göster"
+
+#: src/contents/ui/config/Full.qml:327
+#, kde-format
+msgid "Show shuffle control"
+msgstr "Karıştırma kontrolünü göster"
+
+#: src/contents/ui/config/Full.qml:332
+#, kde-format
+msgid "Show playback controls"
+msgstr "Oynatma kontrollerini göster"
+
+#: src/contents/ui/config/Full.qml:337
+#, kde-format
+msgid "Show loop control"
+msgstr "Döngü kontrolünü göster"
+
+#: src/contents/ui/config/Full.qml:341
 #, kde-format
 msgid "Fill available space with playback controls"
 msgstr "Kullanılabilir alanı oynatma kontrolleriyle doldur"
 
-#: src/contents/ui/config/Full.qml:259
+#: src/contents/ui/config/Full.qml:347
 #, kde-format
 msgid ""
 "When enabled, playback controls are spread across the full width of the "
@@ -461,174 +521,144 @@ msgstr ""
 "Etkinleştirildiğinde, oynatma kontrolleri araç takımının tüm genişliğine "
 "yayılır. Devre dışı bırakıldığında ortada gruplandırılır."
 
-#: src/contents/ui/config/Full.qml:266
+#: src/contents/ui/config/Full.qml:354
 #, kde-format
 msgid "Minimum resizable width:"
 msgstr "Minimum boyutlandırılabilir genişlik:"
 
-#: src/contents/ui/config/Full.qml:274
+#: src/contents/ui/config/Full.qml:362
 #, kde-format
 msgid "Maximum resizable width:"
 msgstr "Maksimum boyutlandırılabilir genişlik:"
 
-#: src/contents/ui/config/Full.qml:282
+#: src/contents/ui/config/Full.qml:370
 #, kde-format
 msgid "Minimum resizable height:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:290
+#: src/contents/ui/config/Full.qml:378
 #, kde-format
 msgid "Maximum resizable height:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:298
+#: src/contents/ui/config/Full.qml:386
 #, kde-format
 msgid "Playback section order:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:311
+#: src/contents/ui/config/Full.qml:399
 #, kde-format
 msgid "Song text"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:312
+#: src/contents/ui/config/Full.qml:400
 #, kde-format
 msgid "Progress bar"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:313
+#: src/contents/ui/config/Full.qml:401
 #, kde-format
 msgid "Volume control"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:314
+#: src/contents/ui/config/Full.qml:402
 #, kde-format
 msgid "Playback controls"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:386
+#: src/contents/ui/config/Full.qml:474
 #, kde-format
 msgid "Show media player selector"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:392
+#: src/contents/ui/config/Full.qml:480
 #, kde-format
 msgid ""
 "Disabled when a preferred player is selected under General > Playback "
 "Source. Only works when 'Choose automatically' is selected."
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:398
+#: src/contents/ui/config/Full.qml:486
 #, kde-format
 msgid "Show pin (keep open) button"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:404
-#, kde-format
-msgid "Album cover"
-msgstr "Albüm kapağı"
-
-#: src/contents/ui/config/Full.qml:408
-#, kde-format
-msgid "Album placeholder:"
-msgstr "Albüm yer tutucusu:"
-
-#: src/contents/ui/config/Full.qml:411 src/contents/ui/config/General.qml:127
-#, kde-format
-msgid "Choose…"
-msgstr "Seç…"
-
-#: src/contents/ui/config/Full.qml:419
-#, kde-format
-msgid "Clear"
-msgstr "Temizle"
-
-#: src/contents/ui/config/Full.qml:440
-#, kde-format
-msgid "Round album cover"
-msgstr "Yuvarlak albüm kapağı"
-
-#: src/contents/ui/config/Full.qml:456
+#: src/contents/ui/config/Full.qml:492
 #, kde-format
 msgid "Playback section side padding:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:464
+#: src/contents/ui/config/Full.qml:500
 #, kde-format
 msgid "Playback section vertical padding:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:472
+#: src/contents/ui/config/Full.qml:508
 #, kde-format
 msgid "Vertical spacing in playback section:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:480
-#, kde-format
-msgid "Album art and lyrics padding:"
-msgstr ""
-
-#: src/contents/ui/config/Full.qml:488
-#, kde-format
-msgid "Spacing between album art and lyrics:"
-msgstr ""
-
-#: src/contents/ui/config/Full.qml:497
+#: src/contents/ui/config/Full.qml:516
 #, kde-format
 msgid "Song Text Customization"
 msgstr "Şarkı metni özelleştirme"
 
 #: src/contents/ui/config/Full.qml:670
 #, kde-format
+msgid "Text scroll speed:"
+msgstr ""
+
+#: src/contents/ui/config/Full.qml:684
+#, kde-format
 msgid "Background (desktop widget only):"
 msgstr "Arka plan (yalnızca masaüstü araç takımı):"
 
-#: src/contents/ui/config/Full.qml:672
+#: src/contents/ui/config/Full.qml:686
 #, kde-format
 msgid "Standard"
 msgstr "Standart"
 
-#: src/contents/ui/config/Full.qml:688
+#: src/contents/ui/config/Full.qml:702
 #, kde-format
 msgid "Transparent"
 msgstr "Saydam"
 
-#: src/contents/ui/config/Full.qml:699
+#: src/contents/ui/config/Full.qml:713
 #, kde-format
 msgid "Transparent (Shadow content)"
 msgstr "Saydam (Gölgeli içerik)"
 
-#: src/contents/ui/config/Full.qml:716
+#: src/contents/ui/config/Full.qml:730
 #, kde-format
 msgid "Use album cover as background"
 msgstr "Albüm kapağını arka plan olarak kullan"
 
-#: src/contents/ui/config/Full.qml:718
+#: src/contents/ui/config/Full.qml:732
 #, kde-format
 msgid "(Experimental feature)"
 msgstr "(Deneysel özellik)"
 
-#: src/contents/ui/config/Full.qml:722
+#: src/contents/ui/config/Full.qml:736
 #, kde-format
 msgid "Use album cover color as tinted background"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:734
+#: src/contents/ui/config/Full.qml:748
 #, kde-format
 msgid "Background tint opacity:"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:738
+#: src/contents/ui/config/Full.qml:752
 #, kde-format
 msgid "Use album-derived gradient"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:744
+#: src/contents/ui/config/Full.qml:758
 #, kde-format
 msgid "Use album-derived text color"
 msgstr ""
 
-#: src/contents/ui/config/Full.qml:756
+#: src/contents/ui/config/Full.qml:770
 #, kde-format
 msgid "Hide album art tooltip"
 msgstr ""
@@ -768,6 +798,10 @@ msgstr "Fare tekeriyle sesi ayarlayın"
 #, kde-format
 msgid "Ctrl+Click to bring player to the front"
 msgstr "Ctrl+Tıklayarak oynatıcıyı öne getirin"
+
+#, kde-format
+#~ msgid "Album cover"
+#~ msgstr "Albüm kapağı"
 
 #, kde-format
 #~ msgid "Song text position:"
