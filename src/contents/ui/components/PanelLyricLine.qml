@@ -101,11 +101,7 @@ Item {
             height: parent.height
             text: root.currentText
             color: root.animationColor
-            font: {
-                let font = root.textFont
-                font.weight = Font.Bold
-                return font
-            }
+            font: root.textFont
             horizontalAlignment: root.horizontalAlignment
             verticalAlignment: Text.AlignVCenter
             elide: Text.ElideRight
