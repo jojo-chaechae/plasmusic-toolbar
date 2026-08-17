@@ -20,6 +20,7 @@ This section tracks changes from the [jojo-chaechae/plasmusic-toolbar](https://g
 * **Playback actions** — button to copy track info to the clipboard and a configurable custom script button.
 * **One-liner install script** — `install.sh` fetches and installs/upgrades the widget from this fork and optionally restarts PlasmaShell.
 * **Package identity** — the widget installs under the distinct id `plasmusic-toolbar-fork` with its own independent versioning (`0.1.0`), so it no longer collides with an upstream `plasmusic-toolbar` install on the same machine.
+* **No media found overhaul** — configurable "no media found" text supports multiple messages (one per line) selected in order or at random, with an optional periodic rotation interval, plus options to hide the playback control buttons in the panel and to hide the panel icon when no media is found.
 
 ## [4.3.1](https://github.com/ccatterina/plasmusic-toolbar/compare/v4.3.0...v4.3.1) (2026-08-09)
 

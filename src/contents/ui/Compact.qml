@@ -56,6 +56,7 @@ Item {
     readonly property int widgetThickness: horizontal ? height : width
     readonly property int controlsSize: Math.round(widgetThickness * plasmoid.configuration.panelControlsSizeRatio)
     readonly property bool spaceBetweenControlsInPanel: plasmoid.configuration.spaceBetweenControlsInPanel
+    readonly property bool hidePlayerControlsWhenNoMedia: plasmoid.configuration.hidePlayerControlsWhenNoMedia
     readonly property int iconSize: Math.round(widgetThickness * plasmoid.configuration.panelIconSizeRatio)
     readonly property int lengthMargin: Math.round((widgetThickness - Math.max(controlsSize, iconSize))) / 2
 
@@ -182,6 +183,7 @@ Item {
         PanelIcon {
             id: panelIcon
             visible: plasmoid.configuration.iconInPanel
+                && !(plasmoid.configuration.hidePanelIconWhenNoMedia && !player.ready)
 
             Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
 
@@ -420,6 +422,8 @@ Item {
             rows: horizontal ? 1 : grid.children.length
             columnSpacing: spaceBetweenControlsInPanel ? Kirigami.Units.smallSpacing : 0
             rowSpacing: spaceBetweenControlsInPanel ? Kirigami.Units.smallSpacing : 0
+
+            visible: !(compact.hidePlayerControlsWhenNoMedia && !player.ready)
 
             Layout.fillHeight: horizontal
             Layout.fillWidth: !horizontal

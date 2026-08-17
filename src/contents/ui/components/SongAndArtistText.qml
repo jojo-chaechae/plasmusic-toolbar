@@ -34,6 +34,45 @@ Item {
 
     property string noMediaText: plasmoid.configuration.noMediaText
 
+    function splitNoMediaMessages(raw) {
+        return String(raw || "")
+            .split(/\r?\n/)
+            .map((s) => s.trim())
+            .filter((s) => s);
+    }
+
+    property var noMediaMessages: splitNoMediaMessages(plasmoid.configuration.noMediaTexts)
+    property int noMediaIndex: 0
+    property string pickedNoMediaText: (noMediaMessages.length ? noMediaMessages : [noMediaText])[noMediaIndex]
+    readonly property bool showingNoMedia: !(root.finalFirstText || root.finalSecondText)
+    readonly property bool noMediaRandomOrder: plasmoid.configuration.noMediaTextOrder === 1
+    readonly property int noMediaRotateInterval: Math.max(1, plasmoid.configuration.noMediaTextRotateInterval) * 1000
+
+    function advanceNoMediaIndex() {
+        if (!root.noMediaMessages.length) return
+        if (root.noMediaRandomOrder) {
+            root.noMediaIndex = Math.floor(Math.random() * root.noMediaMessages.length)
+        } else {
+            root.noMediaIndex = (root.noMediaIndex + 1) % root.noMediaMessages.length
+        }
+    }
+
+    onShowingNoMediaChanged: {
+        if (root.showingNoMedia && root.noMediaMessages.length) {
+            root.advanceNoMediaIndex()
+        }
+    }
+
+    Timer {
+        id: noMediaRotateTimer
+        interval: root.noMediaRotateInterval
+        running: root.showingNoMedia
+            && plasmoid.configuration.noMediaTextRotateEnabled
+            && root.noMediaMessages.length > 1
+        repeat: true
+        onTriggered: root.advanceNoMediaIndex()
+    }
+
     property int titlePosition: SongAndArtistText.TextPosition.FirstLine
     property int artistsPosition: SongAndArtistText.TextPosition.FirstLine
     property int albumPosition: SongAndArtistText.TextPosition.Hidden
@@ -86,7 +125,7 @@ Item {
 
             font: finalSecondText.length > 0 ? root.boldTextFont : root.textFont;
             maxWidth: root.maxWidth !== undefined ? root.maxWidth : root.width
-            text: root.finalFirstText || root.finalSecondText ? root.finalFirstText : noMediaText
+            text: root.finalFirstText || root.finalSecondText ? root.finalFirstText : root.pickedNoMediaText
         }
 
         // second row of text

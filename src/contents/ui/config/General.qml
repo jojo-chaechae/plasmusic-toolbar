@@ -15,7 +15,12 @@ KCM.SimpleKCM {
     property alias cfg_useCustomFont: customFontCheckbox.checked
     property alias cfg_customFont: fontDialog.fontChosen
     property alias cfg_volumeStep: volumeStepSpinbox.value
-    property alias cfg_noMediaText: noMediaText.text
+    property alias cfg_noMediaTexts: noMediaTexts.text
+    property alias cfg_noMediaTextOrder: noMediaTextOrder.value
+    property alias cfg_noMediaTextRotateEnabled: noMediaTextRotateEnabled.checked
+    property alias cfg_noMediaTextRotateInterval: noMediaTextRotateInterval.value
+    property alias cfg_hidePlayerControlsWhenNoMedia: hidePlayerControlsWhenNoMedia.checked
+    property alias cfg_hidePanelIconWhenNoMedia: hidePanelIconWhenNoMedia.checked
     property alias cfg_showWhenNoMedia: showWhenNoMedia.checked
 
     property var preferredIdentities: {
@@ -150,10 +155,67 @@ KCM.SimpleKCM {
             Kirigami.FormData.label: i18n("Show widget when no media found")
         }
 
-        TextField {
-            id: noMediaText
+        CheckBox {
+            id: hidePlayerControlsWhenNoMedia
+            Kirigami.FormData.label: i18n("Hide player control buttons in the panel when no media found")
+            enabled: showWhenNoMedia.checked
+        }
+
+        CheckBox {
+            id: hidePanelIconWhenNoMedia
+            Kirigami.FormData.label: i18n("Hide panel icon when no media found")
+            enabled: showWhenNoMedia.checked
+        }
+
+        TextArea {
+            id: noMediaTexts
             Kirigami.FormData.label: i18n("Text displayed when no media found:")
             enabled: showWhenNoMedia.checked
+            Layout.fillWidth: true
+            implicitHeight: Math.max(60, contentHeight + 20)
+            placeholderText: i18n("No media found")
+            wrapMode: TextEdit.Wrap
+        }
+        Kirigami.InlineMessage {
+            Layout.fillWidth: true
+            type: Kirigami.MessageType.Information
+            text: i18n("Enter each message on its own line.")
+        }
+
+        ButtonGroup {
+            id: noMediaTextOrder
+            property int value: 0
+        }
+
+        RadioButton {
+            Kirigami.FormData.label: i18n("Message selection:")
+            text: i18n("In order")
+            checked: noMediaTextOrder.value === 0
+            onCheckedChanged: if (checked) noMediaTextOrder.value = 0
+            ButtonGroup.group: noMediaTextOrder
+        }
+
+        RadioButton {
+            text: i18n("Random")
+            checked: noMediaTextOrder.value === 1
+            onCheckedChanged: if (checked) noMediaTextOrder.value = 1
+            ButtonGroup.group: noMediaTextOrder
+        }
+
+        CheckBox {
+            id: noMediaTextRotateEnabled
+            Kirigami.FormData.label: i18n("Rotate message periodically")
+            enabled: showWhenNoMedia.checked
+        }
+
+        SpinBox {
+            id: noMediaTextRotateInterval
+            enabled: noMediaTextRotateEnabled.checked && showWhenNoMedia.checked
+            from: 1
+            to: 3600
+            textFromValue: function(text) { return text + "s"; }
+            valueFromText: function(value) { return parseInt(value); }
+            Kirigami.FormData.label: i18n("Rotation interval:")
         }
 
         Kirigami.Separator {
