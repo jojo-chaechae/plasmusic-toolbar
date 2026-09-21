@@ -36,7 +36,6 @@ KCM.SimpleKCM {
     property alias cfg_fullViewMinHeight: fullViewMinHeight.value
     property alias cfg_fullViewMaxHeight: fullViewMaxHeight.value
     property alias cfg_showPlayerSelector: showPlayerSelector.checked
-    property alias cfg_showPinButton: showPinButton.checked
     property alias cfg_fullAlbumCoverRounded: fullAlbumCoverRounded.checked
     property alias cfg_fullAlbumCoverRadius: fullAlbumCoverRadius.value
     property alias cfg_hideCanBeRaisedTooltip: hideCanBeRaisedTooltip.checked
@@ -210,11 +209,6 @@ KCM.SimpleKCM {
                     "Disabled when a preferred player is selected under General > Playback Source. Only works when 'Choose automatically' is selected."
                 )
             }
-        }
-
-        CheckBox {
-            Kirigami.FormData.label: i18n("Show pin (keep open) button")
-            id: showPinButton
         }
 
         Kirigami.Separator {
