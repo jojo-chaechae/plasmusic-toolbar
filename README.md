@@ -46,7 +46,7 @@ The script is detected once per song, from all of its lines together, since a si
 
 - **Korean** uses Revised Romanization, including the sound changes across syllable boundaries: 독립문 becomes `dongnimmun`, not `doklipmun`.
 - **Chinese** uses Hanyu Pinyin with tone marks. Polyphonic characters are resolved through a word list, so 长大 is `zhǎng dà` while 长发 is `cháng fà`. Syllables are separated individually, as word boundaries cannot be recovered from the text.
-- **Japanese** uses Hepburn for kana. Kanji are left as they are and spaced apart from the surrounding romaji — 君の名は becomes `君 no 名 wa` — because mapping them to readings needs a morphological dictionary that would dwarf the rest of the widget. Lines written mostly in kanji therefore gain little.
+- **Japanese** uses Hepburn for kana and a growing offline word dictionary for common kanji lyrics — 君の名は becomes `kimi no na wa`. Unknown kanji are left in place rather than guessed, since readings depend on the surrounding word.
 
 
 ## 📦 Installation

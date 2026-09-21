@@ -23,9 +23,12 @@ function load(name, deps = {}) {
 
 const Hangul = load("Hangul.js")
 const Kana = load("Kana.js")
+const JMDict = load("JMDictData.js")
+const Kanji = load("Kanji.js", {JMDict})
 const Data = load("PinyinData.js")
 const Pinyin = load("Pinyin.js", {Data})
-const Romanize = load("Romanize.js", {Hangul, Kana, Pinyin})
+const Romanize = load("Romanize.js", {Hangul, Kana, Kanji, Pinyin})
+const Japanese = {romanize: line => Romanize.romanizeLine(line, "ja")}
 
 const CASES = [
     // Korean: syllable liaison and the consonant assimilations that make the
@@ -72,6 +75,12 @@ const CASES = [
     [Kana, "君の名は", "君 no 名 wa"],
     [Kana, "さよならを言えなくて", "sayonara o 言 enakute"],
     [Kana, "I LOVE ユー", "I LOVE yū"],
+
+    // Japanese kanji word readings are expanded before the kana romanizer.
+    [Japanese, "君の名は", "kimi no na wa"],
+    [Japanese, "僕は知らない", "boku wa shiranai"],
+    [Japanese, "大丈夫だよ", "daijoubu dayo"],
+    [Japanese, "世界の声", "sekai no koe"],
 
     // Chinese: polyphones resolved by the word list, everything else by the
     // per-character table.

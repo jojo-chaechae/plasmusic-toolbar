@@ -15,7 +15,7 @@ var TAIL_COUNT = 28
 
 var LEADS = ["g", "kk", "n", "d", "tt", "r", "m", "b", "pp", "s", "ss", "",
              "j", "jj", "ch", "k", "t", "p", "h"]
-var VOWELS = ["a", "ae", "ya", "yae", "eo", "e", "yeo", "ye", "o", "wa", "wae",
+var HANGUL_VOWELS = ["a", "ae", "ya", "yae", "eo", "e", "yeo", "ye", "o", "wa", "wae",
               "oe", "yo", "u", "wo", "we", "wi", "yu", "eu", "ui", "i"]
 // Tails take their pronounced value: only seven sounds end a Korean syllable.
 var TAILS = ["", "k", "k", "k", "n", "n", "n", "t", "l", "k", "m", "l", "l",
@@ -98,7 +98,7 @@ function _romanizeRun(syllables) {
         var next = i + 1 < syllables.length ? syllables[i + 1] : null
 
         out += i === 0 ? LEADS[current.lead] : ""
-        out += VOWELS[current.vowel]
+        out += HANGUL_VOWELS[current.vowel]
 
         if (!next) {
             out += TAILS[current.tail]

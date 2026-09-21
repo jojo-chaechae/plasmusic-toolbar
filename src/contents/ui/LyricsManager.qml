@@ -1,8 +1,12 @@
 import QtQuick
-import "lib/Romanize.js" as Romanize
+import QtQml.WorkerScript
 
-QtObject {
+Item {
     id: root
+
+    visible: false
+    width: 0
+    height: 0
 
     property bool enabled: false
     property string title: ""
@@ -25,6 +29,7 @@ QtObject {
     // transliterate. 0 = off, 1 = replace the original.
     property int romanizationMode: 0
     property var romanizedLines: []
+    property int _romanizationRequestId: 0
     // `lines` with every romanizable entry swapped out, for replace mode.
     readonly property var replacedLines: {
         if (!romanizedLines.length) return lines
@@ -40,6 +45,15 @@ QtObject {
     property string _lastQuery: ""
     property int _requestId: 0
     property var _activeRequest: null
+
+    WorkerScript {
+        id: romanizationWorker
+        source: "RomanizeWorker.js"
+        onMessage: function(message) {
+            if (message.id !== root._romanizationRequestId) return
+            if (root.romanizationMode !== 0) root.romanizedLines = message.lines
+        }
+    }
 
     property var debounceTimer: Timer {
         interval: 300
@@ -66,12 +80,16 @@ QtObject {
     }
 
     function _updateRomanization() {
+        _romanizationRequestId += 1
         if (romanizationMode === 0 || !lines.length) {
             if (romanizedLines.length) romanizedLines = []
             return
         }
 
-        romanizedLines = Romanize.romanizeLines(lines).lines
+        romanizationWorker.sendMessage({
+            id: _romanizationRequestId,
+            lines: lines
+        })
     }
 
     function _queryKey() {

@@ -1,6 +1,7 @@
 .pragma library
 .import "Hangul.js" as Hangul
 .import "Kana.js" as Kana
+.import "Kanji.js" as Kanji
 .import "Pinyin.js" as Pinyin
 
 // Picks a romanizer for a set of lyric lines and applies it.
@@ -28,14 +29,14 @@ function detect(lines) {
 
 function romanizeLine(line, script) {
     if (script === SCRIPT_KOREAN) return Hangul.romanize(line)
-    if (script === SCRIPT_JAPANESE) return Kana.romanize(line)
+    if (script === SCRIPT_JAPANESE) return Kana.romanize(Kanji.toKana(line))
     if (script === SCRIPT_CHINESE) return Pinyin.romanize(line)
     return line
 }
 
 // Returns a romanization for every entry of `lines`, empty where the line came
-// back unchanged: break markers, latin lines, and Japanese lines written purely
-// in kanji have nothing to show that the original does not already show.
+// back unchanged: break markers, latin lines, and Japanese text whose kanji
+// words are not in the bundled dictionary have nothing safe to show.
 function romanizeLines(lines) {
     var script = detect(lines)
     var out = []
