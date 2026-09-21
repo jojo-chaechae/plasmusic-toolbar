@@ -130,12 +130,42 @@ Item {
     // Height floor that keeps the fixed content (everything except the flexible thumbnail) from clipping.
     readonly property real fixedContentHeight: Math.max(0, column.implicitHeight - naturalThumbHeight)
 
+    readonly property real initialPreferredWidth: plasmoid.configuration.fullViewWidth > 0
+        ? Math.min(Math.max(plasmoid.configuration.fullViewWidth, effectiveMinWidth), maximumWidth)
+        : effectiveMinWidth
+    readonly property real initialPreferredHeight: plasmoid.configuration.fullViewHeight > 0
+        ? Math.min(Math.max(plasmoid.configuration.fullViewHeight, configMinHeight), maximumHeight)
+        : Math.max(configMinHeight, fixedContentHeight)
+    property real preferredWidth: initialPreferredWidth
+    property real preferredHeight: initialPreferredHeight
+    property bool sizeInitialized: false
+
     Layout.minimumWidth: effectiveMinWidth
     Layout.maximumWidth: maximumWidth
-    Layout.preferredWidth: effectiveMinWidth
-    Layout.preferredHeight: column.implicitHeight
+    Layout.preferredWidth: preferredWidth
+    Layout.preferredHeight: preferredHeight
     Layout.minimumHeight: Math.max(configMinHeight, fixedContentHeight)
     Layout.maximumHeight: maximumHeight
+
+    Component.onCompleted: {
+        // Break the initial bindings after the saved dimensions have been
+        // applied, so content changes cannot replace the user's size.
+        preferredWidth = initialPreferredWidth
+        preferredHeight = initialPreferredHeight
+        sizeInitialized = true
+    }
+
+    onWidthChanged: {
+        if (!sizeInitialized || width <= 0 || Math.abs(width - preferredWidth) < 1) return
+        preferredWidth = width
+        plasmoid.configuration.fullViewWidth = Math.round(width)
+    }
+
+    onHeightChanged: {
+        if (!sizeInitialized || height <= 0 || Math.abs(height - preferredHeight) < 1) return
+        preferredHeight = height
+        plasmoid.configuration.fullViewHeight = Math.round(height)
+    }
 
     // Store the original theme colors (root keeps default Kirigami.Theme.inherit: true)
     readonly property color _originalTextColor: Kirigami.Theme.textColor
