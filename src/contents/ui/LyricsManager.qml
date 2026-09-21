@@ -1,4 +1,5 @@
 import QtQuick
+import "lib/Romanize.js" as Romanize
 
 QtObject {
     id: root
@@ -19,6 +20,19 @@ QtObject {
     property int intermissionThreshold: 8 // seconds
     readonly property int breakThreshold: Math.max(1, intermissionThreshold) * 1000 // milliseconds
     property bool available: false
+
+    // Romanization of `lines`, empty per line where there was nothing to
+    // transliterate. 0 = off, 1 = replace the original.
+    property int romanizationMode: 0
+    property var romanizedLines: []
+    // `lines` with every romanizable entry swapped out, for replace mode.
+    readonly property var replacedLines: {
+        if (!romanizedLines.length) return lines
+        const merged = []
+        for (let i = 0; i < lines.length; ++i) merged.push(romanizedLines[i] || lines[i])
+        return merged
+    }
+
     property var _timedLines: []
     property var _displayLineIndices: []
 
@@ -39,12 +53,25 @@ QtObject {
     onAlbumChanged: _scheduleFetch()
     onSongLengthChanged: _scheduleFetch()
     onSongPositionChanged: syncPosition()
-    onLinesChanged: syncPosition()
+    onLinesChanged: {
+        _updateRomanization()
+        syncPosition()
+    }
+    onRomanizationModeChanged: _updateRomanization()
     onIntermissionThresholdChanged: {
         if (_timedLines.length) {
             _buildDisplayLines()
             syncPosition()
         }
+    }
+
+    function _updateRomanization() {
+        if (romanizationMode === 0 || !lines.length) {
+            if (romanizedLines.length) romanizedLines = []
+            return
+        }
+
+        romanizedLines = Romanize.romanizeLines(lines).lines
     }
 
     function _queryKey() {

@@ -54,6 +54,7 @@ Item {
     property real lyricsLineSpacing: plasmoid.configuration.fullViewLyricsLineSpacing
     property int lyricsAnimation: plasmoid.configuration.fullViewLyricsAnimation
     property int lyricsIntermissionThreshold: plasmoid.configuration.fullViewLyricsIntermissionThreshold
+    property int lyricsRomanization: plasmoid.configuration.fullViewLyricsRomanization
     property int mediaPosition: plasmoid.configuration.fullViewMediaPosition
     property int mediaOrder: plasmoid.configuration.fullViewMediaOrder
     // Order of the playback section rows (any permutation of: song, progress, volume, controls)
@@ -65,6 +66,7 @@ Item {
         id: lyricsManager
         enabled: root.lyricsVisible
         intermissionThreshold: root.lyricsIntermissionThreshold
+        romanizationMode: root.lyricsRomanization
         title: player.title
         artists: player.artists
         album: player.album
@@ -469,7 +471,7 @@ Item {
             raiseOnAlbumArtClick: root.albumCoverClickToRaise
             hideRaiseTooltip: plasmoid.configuration.hideCanBeRaisedTooltip
             lyricsVisible: root.lyricsVisible
-            lyricsLines: lyricsManager.lines
+            lyricsLines: root.lyricsRomanization === 1 ? lyricsManager.replacedLines : lyricsManager.lines
             lyricsTimestamps: lyricsManager.lineTimestamps
             lyricsAvailable: lyricsManager.available
             currentLine: lyricsManager.currentLine

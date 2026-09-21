@@ -57,6 +57,7 @@ KCM.SimpleKCM {
     property alias cfg_fullViewLyricsLineSpacing: fullViewLyricsLineSpacing.value
     property alias cfg_fullViewLyricsAnimation: fullViewLyricsAnimation.currentIndex
     property alias cfg_fullViewLyricsIntermissionThreshold: fullViewLyricsIntermissionThreshold.value
+    property alias cfg_fullViewLyricsRomanization: fullViewLyricsRomanization.value
     property alias cfg_fullViewPlaybackSectionActionsVisible: fullViewPlaybackSectionActionsVisible.checked
     property alias cfg_fullViewPlaybackScriptButtonEnabled: fullViewPlaybackScriptButtonEnabled.checked
     property alias cfg_fullViewPlaybackScriptPath: fullViewPlaybackScriptPath.text
@@ -214,6 +215,26 @@ KCM.SimpleKCM {
             from: 1
             to: 30
             stepSize: 1
+        }
+
+        ButtonGroup {
+            id: fullViewLyricsRomanization
+            property int value: 0
+        }
+
+        RadioButton {
+            Kirigami.FormData.label: i18n("Romanize Korean, Japanese and Chinese:")
+            text: i18n("Off")
+            checked: fullViewLyricsRomanization.value === 0
+            onCheckedChanged: if (checked) fullViewLyricsRomanization.value = 0
+            ButtonGroup.group: fullViewLyricsRomanization
+        }
+
+        RadioButton {
+            text: i18n("Replace the original line")
+            checked: fullViewLyricsRomanization.value === 1
+            onCheckedChanged: if (checked) fullViewLyricsRomanization.value = 1
+            ButtonGroup.group: fullViewLyricsRomanization
         }
 
         ButtonGroup {

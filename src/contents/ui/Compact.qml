@@ -24,6 +24,11 @@ Item {
     readonly property int miniLyricsAnimation: plasmoid.configuration.panelMiniLyricsAnimation
     readonly property int panelLyricsAnimation: plasmoid.configuration.panelMiniLyricsAnimation
     readonly property bool miniLyricsClickable: plasmoid.configuration.panelMiniLyricsClickable
+    readonly property int lyricsRomanization: plasmoid.configuration.panelLyricsRomanization
+    // The panel only ever shows the romanization in place of the original:
+    // there is no room under a line for a second one.
+    readonly property var lyricLines: lyricsRomanization === 1
+        ? lyricsManager.replacedLines : lyricsManager.lines
     readonly property bool panelTextStableWidthActive: panelTextStableWidth
         || (panelTextHoverSwap && panelTextMode !== 2)
     readonly property bool lyricsConfigured: panelTextMode === 1 || panelTextMode === 2
@@ -74,6 +79,7 @@ Item {
     LyricsManager {
         id: lyricsManager
         enabled: compact.lyricsConfigured
+        romanizationMode: compact.lyricsRomanization
         title: player.title
         artists: player.artists
         album: player.album
@@ -362,7 +368,7 @@ Item {
                     id: lyricsView
                     anchors.fill: parent
                     visible: !compact.miniLyricsMode
-                    lines: lyricsManager.lines
+                    lines: compact.lyricLines
                     lineTimestamps: lyricsManager.lineTimestamps
                     currentLine: lyricsManager.currentLine
                     currentLineDuration: lyricsManager.currentLineDuration
@@ -379,7 +385,7 @@ Item {
                     id: miniLyricsView
                     anchors.fill: parent
                     visible: compact.miniLyricsMode
-                    lines: lyricsManager.lines
+                    lines: compact.lyricLines
                     lineTimestamps: lyricsManager.lineTimestamps
                     currentLine: lyricsManager.currentLine
                     currentLineDuration: lyricsManager.currentLineDuration

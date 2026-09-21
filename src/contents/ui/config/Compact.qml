@@ -25,6 +25,7 @@ KCM.SimpleKCM {
     property alias cfg_panelMiniLyricsAlignment: panelMiniLyricsAlignment.value
     property alias cfg_panelMiniLyricsAnimation: panelMiniLyricsAnimation.value
     property alias cfg_panelMiniLyricsClickable: panelMiniLyricsClickable.checked
+    property alias cfg_panelLyricsRomanization: panelLyricsRomanization.value
     property alias cfg_iconInPanel: iconInPanel.checked
     property alias cfg_maxSongWidthInPanel: maxSongWidthInPanel.value
     property alias cfg_songTextFixedWidth: songTextFixedWidth.value
@@ -215,6 +216,28 @@ KCM.SimpleKCM {
             id: panelMiniLyricsClickable
             enabled: panelTextMode.value === 3
             Kirigami.FormData.label: i18n("Make mini lyrics clickable")
+        }
+
+        ButtonGroup {
+            id: panelLyricsRomanization
+            property int value: 0
+        }
+
+        RadioButton {
+            Kirigami.FormData.label: i18n("Romanize Korean, Japanese and Chinese:")
+            text: i18n("Off")
+            enabled: panelTextMode.value >= 1 && panelTextMode.value <= 3
+            checked: panelLyricsRomanization.value === 0
+            onCheckedChanged: if (checked) panelLyricsRomanization.value = 0
+            ButtonGroup.group: panelLyricsRomanization
+        }
+
+        RadioButton {
+            text: i18n("Replace the original line")
+            enabled: panelTextMode.value >= 1 && panelTextMode.value <= 3
+            checked: panelLyricsRomanization.value === 1
+            onCheckedChanged: if (checked) panelLyricsRomanization.value = 1
+            ButtonGroup.group: panelLyricsRomanization
         }
 
         CheckBox {

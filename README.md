@@ -20,6 +20,7 @@ PlasMusic Toolbar is a KDE Plasma widget that shows current playback information
 - **⏯️ Playback Controls** — Play, pause, skip and go back without leaving the panel.
 - **📸 Full View** — Popup with album art, full playback controls (shuffle, repeat included), volume and seek bar.
 - **🎼 Synced Mini-Lyrics** — Optional LRCLIB-backed lyrics with clickable timestamp seeking, horizontal overflow scrolling, configurable intermission markers, and experimental glow animation.
+- **🔤 Lyrics Romanization** — Korean, Japanese and Chinese lyrics transliterated to the latin alphabet, in place of the original line.
 - **🖼️ Combined Media View** — Configure album art and mini-lyrics together, including their order, position above or below playback controls, spacing, padding, and album-art visibility.
 - **🔀 Preferred Source** — Choose which media player the widget should follow.
 - **🖥️ Flexible Layout** — Works in horizontal and vertical panels, and as a desktop widget.
@@ -36,6 +37,16 @@ Mini-lyrics are disabled by default and can be enabled in **Full View → Media 
 - Large timing gaps can be shown as a `♪` intermission row. The gap threshold is configurable in seconds and defaults to 8 seconds.
 - The experimental animation selector currently provides `None` and `Glow sweep`.
 - Lyrics are unavailable when LRCLIB has no matching synced lyrics or network access is unavailable.
+
+### Romanization
+
+CJK lyrics can be transliterated to the latin alphabet, configured separately for the panel (**Panel View → Romanize Korean, Japanese and Chinese**) and the popup (**Full View → Romanize Korean, Japanese and Chinese**). Romanization replaces the original line. Everything runs offline, from tables shipped with the widget.
+
+The script is detected once per song, from all of its lines together, since a single line of Japanese is often indistinguishable from Chinese.
+
+- **Korean** uses Revised Romanization, including the sound changes across syllable boundaries: 독립문 becomes `dongnimmun`, not `doklipmun`.
+- **Chinese** uses Hanyu Pinyin with tone marks. Polyphonic characters are resolved through a word list, so 长大 is `zhǎng dà` while 长发 is `cháng fà`. Syllables are separated individually, as word boundaries cannot be recovered from the text.
+- **Japanese** uses Hepburn for kana. Kanji are left as they are and spaced apart from the surrounding romaji — 君の名は becomes `君 no 名 wa` — because mapping them to readings needs a morphological dictionary that would dwarf the rest of the widget. Lines written mostly in kanji therefore gain little.
 
 
 ## 📦 Installation

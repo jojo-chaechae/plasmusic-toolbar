@@ -50,7 +50,8 @@ Item {
 
     readonly property bool bothVisible: albumArtVisible && hasLyrics
     readonly property real lyricPixelSize: lyricsFontSize > 0 ? lyricsFontSize : textFont.pixelSize
-    readonly property real minimumLyricsHeight: Math.max(Kirigami.Units.gridUnit, lyricPixelSize * lyricsLineSpacing)
+    readonly property real minimumLyricsHeight:
+        Math.max(Kirigami.Units.gridUnit, lyricPixelSize * lyricsLineSpacing)
     readonly property real albumArtAllocatedHeight: albumArtVisible ? albumArtHeight : 0
     readonly property real lyricsHeight: hasLyrics
         ? Math.max(minimumLyricsHeight, height - (albumArtVisible ? albumArtHeight + mediaSpacing : 0))
