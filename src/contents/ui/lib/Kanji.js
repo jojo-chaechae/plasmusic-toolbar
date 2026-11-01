@@ -1,4 +1,5 @@
 .pragma library
+.import "UniDicData.js" as UniDic
 .import "JMDictData.js" as JMDict
 
 // A deliberately small Japanese word-reading dictionary.
@@ -8,6 +9,16 @@
 // left in place for Kana.romanize() to render without guessing.
 
 var OVERRIDES = {
+    "知らず": "しらず",
+    "擦り": "すり",
+    "減らした": "へらした",
+    "残された": "のこされた",
+    "見せず": "みせず",
+    "隠した": "かくした",
+    "閉じて": "とじて",
+    "美しさ": "うつくしさ",
+    "美しい": "うつくしい",
+    "言われた": "いわれた",
     "ありがとうございます": "ありがとうございます",
     "おめでとう": "おめでとう",
     "大丈夫": "だいじょうぶ",
@@ -64,6 +75,7 @@ var OVERRIDES = {
 }
 
 var WORDS = {}
+for (var uniDicWord in UniDic.WORDS) WORDS[uniDicWord] = UniDic.WORDS[uniDicWord]
 for (var generatedWord in JMDict.WORDS) WORDS[generatedWord] = JMDict.WORDS[generatedWord]
 for (var overrideWord in OVERRIDES) WORDS[overrideWord] = OVERRIDES[overrideWord]
 

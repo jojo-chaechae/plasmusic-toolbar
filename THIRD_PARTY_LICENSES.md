@@ -18,3 +18,14 @@ the current `JMdict_e` XML file and run:
 ```sh
 python3 tools/gen-jmdict-data.py JMdict_e > src/contents/ui/lib/JMDictData.js
 ```
+
+## UniDic-lite
+
+`src/contents/ui/lib/UniDicData.js` is generated from the UniDic 2.1.2
+`lex.csv` source used by UniDic-lite:
+
+https://github.com/polm/unidic-lite
+
+UniDic is developed by the UniDic Consortium and NINJAL and is distributed
+under the modified BSD licence. Only common surface forms and their
+pronunciations are retained in the generated file.

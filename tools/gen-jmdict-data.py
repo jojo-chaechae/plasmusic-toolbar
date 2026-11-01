@@ -58,7 +58,7 @@ def generate(path):
 
         for element in entry.findall("k_ele"):
             word = element.findtext("keb")
-            if not word or not KANJI.search(word) or len(word) < 2 or not JAPANESE_WORD.fullmatch(word):
+            if not word or not KANJI.search(word) or not JAPANESE_WORD.fullmatch(word):
                 continue
             # A phrase such as 君の名 is not useful as one replacement: the
             # kana connector の would disappear into the reading and the

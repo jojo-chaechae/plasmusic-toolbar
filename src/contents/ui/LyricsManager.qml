@@ -61,6 +61,17 @@ Item {
         onTriggered: root._fetchLyrics()
     }
 
+    property var retryTimer: Timer {
+        interval: 1000
+        repeat: false
+        property var retry: null
+        onTriggered: {
+            const action = retry
+            retry = null
+            if (action) action()
+        }
+    }
+
     onEnabledChanged: _scheduleFetch()
     onTitleChanged: _scheduleFetch()
     onArtistsChanged: _scheduleFetch()
@@ -136,6 +147,8 @@ Item {
 
     function _abortActiveRequest() {
         _requestId++
+        retryTimer.stop()
+        retryTimer.retry = null
         if (!_activeRequest) return
 
         const request = _activeRequest
@@ -167,7 +180,7 @@ Item {
             if (status === 200) {
                 if (_useResponse(responseText, requestId, query)) return
             }
-            if (status === 404 || status === 200) {
+            if (status === 404 || status === 200 || status === 429 || status >= 500) {
                 _searchLyrics(requestId, query)
             } else if (_isCurrent(requestId, query)) {
                 loading = false
@@ -178,8 +191,25 @@ Item {
     function _searchLyrics(requestId, query) {
         if (!_isCurrent(requestId, query)) return
 
-        const url = "https://lrclib.net/api/search?track_name=" + encodeURIComponent(title)
-            + "&artist_name=" + encodeURIComponent(artists)
+        const searches = [{title: title, artist: artists}]
+        // Players often append featured artists to the title or combine several
+        // artist names, while LRCLIB indexes the primary artist separately.
+        const cleanTitle = title.replace(/\s*[\[(]\s*(?:feat\.?|ft\.?)\s+[^\])]+[\])]\s*$/i, "").trim()
+        const primaryArtist = artists.split(/\s*(?:,|;|\s+&\s+|\s+(?:feat\.?|ft\.?)\s+)\s*/i)[0].trim()
+        if (cleanTitle !== title || primaryArtist !== artists)
+            searches.push({title: cleanTitle || title, artist: primaryArtist || artists})
+        _searchNext(requestId, query, searches, 0)
+    }
+
+    function _searchNext(requestId, query, searches, index) {
+        if (!_isCurrent(requestId, query)) return
+        if (index >= searches.length) {
+            loading = false
+            return
+        }
+        const search = searches[index]
+        const url = "https://lrclib.net/api/search?track_name=" + encodeURIComponent(search.title)
+            + "&artist_name=" + encodeURIComponent(search.artist)
         _request(url, requestId, query, function(status, responseText) {
             if (!_isCurrent(requestId, query)) return
 
@@ -193,27 +223,38 @@ Item {
                     // Treat malformed responses as unavailable lyrics.
                 }
             }
-            loading = false
+            if (status === 200) _searchNext(requestId, query, searches, index + 1)
+            else loading = false
         })
     }
 
-    function _request(url, requestId, query, callback) {
+    function _request(url, requestId, query, callback, attempt) {
+        const retries = attempt || 0
         const request = new XMLHttpRequest()
         let finished = false
         _activeRequest = request
-        request.onreadystatechange = function() {
-            if (request.readyState !== XMLHttpRequest.DONE || finished) return
-            finished = true
-            if (!_isCurrent(requestId, query)) return
-            if (_activeRequest === request) _activeRequest = null
-            callback(request.status, request.responseText)
-        }
-        request.onerror = function() {
+        function finish(status, responseText) {
             if (finished) return
             finished = true
             if (!_isCurrent(requestId, query)) return
             if (_activeRequest === request) _activeRequest = null
-            callback(0, "")
+            if ((status === 0 || status === 429 || status >= 500) && retries < 2) {
+                retryTimer.interval = 1000 * (retries + 1)
+                retryTimer.retry = function() {
+                    if (_isCurrent(requestId, query))
+                        _request(url, requestId, query, callback, retries + 1)
+                }
+                retryTimer.restart()
+                return
+            }
+            callback(status, responseText)
+        }
+        request.onreadystatechange = function() {
+            if (request.readyState !== XMLHttpRequest.DONE || finished) return
+            finish(request.status, request.responseText)
+        }
+        request.onerror = function() {
+            finish(0, "")
         }
         request.ontimeout = request.onerror
         request.open("GET", url)
@@ -275,15 +316,17 @@ Item {
         const parsed = []
         const sourceLines = lrc.split(/\r?\n/)
         for (const sourceLine of sourceLines) {
-            const matches = sourceLine.match(/\[(\d+):(\d{2})[.:](\d{2,3})\]\s*(.*)/)
-            if (!matches) continue
-
-            const fraction = matches[3].length === 2
-                ? Number(matches[3]) * 10
-                : Number(matches[3])
-            const time = Number(matches[1]) * 60000 + Number(matches[2]) * 1000 + fraction
-            const text = matches[4].trim()
-            if (text) parsed.push({time: time, text: text})
+            const prefix = sourceLine.match(/^\s*((?:\[\d+:\d{2}(?:[.:]\d{1,3})?\])+)(.*)$/)
+            if (!prefix) continue
+            const text = prefix[2].trim()
+            if (!text) continue
+            const timestamps = prefix[1].match(/\[\d+:\d{2}(?:[.:]\d{1,3})?\]/g)
+            for (const timestamp of timestamps) {
+                const matches = timestamp.match(/\[(\d+):(\d{2})(?:[.:](\d{1,3}))?\]/)
+                const fraction = matches[3] ? Number((matches[3] + "00").slice(0, 3)) : 0
+                const time = Number(matches[1]) * 60000 + Number(matches[2]) * 1000 + fraction
+                parsed.push({time: time, text: text})
+            }
         }
         parsed.sort((a, b) => a.time - b.time)
         return parsed

@@ -17,11 +17,21 @@ var Data = {
 Qt.include("lib/Pinyin.js")
 var Pinyin = {hasHan: hasHan, romanize: romanize}
 
+Qt.include("lib/UniDicData.js")
+var UNIDIC_WORDS = WORDS
 Qt.include("lib/JMDictData.js")
+var JMDICT_WORDS = WORDS
 
 var WORKER_WORDS = {}
-for (var generatedWord in WORDS) WORKER_WORDS[generatedWord] = WORDS[generatedWord]
+for (var uniDicWord in UNIDIC_WORDS) WORKER_WORDS[uniDicWord] = UNIDIC_WORDS[uniDicWord]
+for (var generatedWord in JMDICT_WORDS) {
+    if (WORKER_WORDS[generatedWord] === undefined) WORKER_WORDS[generatedWord] = JMDICT_WORDS[generatedWord]
+}
 var OVERRIDES = {
+    "知らず": "しらず", "擦り": "すり", "減らした": "へらした",
+    "残された": "のこされた", "見せず": "みせず", "隠した": "かくした",
+    "閉じて": "とじて", "美しさ": "うつくしさ", "美しい": "うつくしい",
+    "言われた": "いわれた",
     "名": "な", "君": "きみ", "僕": "ぼく", "私": "わたし",
     "何": "なに", "誰": "だれ", "声": "こえ"
 }

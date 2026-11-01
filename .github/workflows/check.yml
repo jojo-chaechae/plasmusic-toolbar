@@ -1,0 +1,28 @@
+name: Check widget
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install gettext
+        run: sudo apt-get update && sudo apt-get install -y gettext
+      - name: Test romanization
+        run: node tools/test-romanization.mjs
+      - name: Compile translations
+        run: ./bin/i18n compile
+      - name: Check widget metadata and release version
+        run: |
+          node -e 'const m = require("./src/metadata.json"); const v = require("./.release-please-manifest.json")["."]; if (m.KPackageStructure !== "Plasma/Applet" || m.KPlugin.Id !== "plasmusic-toolbar-fork" || m.KPlugin.Version !== v) throw new Error("Invalid package metadata or mismatched version")'
+      - name: Check package archive
+        run: |
+          (cd src && zip -qr "$RUNNER_TEMP/widget.plasmoid" .)
+          unzip -t "$RUNNER_TEMP/widget.plasmoid"
+          unzip -p "$RUNNER_TEMP/widget.plasmoid" metadata.json | node -e 'let s=""; process.stdin.on("data", c => s += c); process.stdin.on("end", () => { if (JSON.parse(s).KPlugin.Id !== "plasmusic-toolbar-fork") throw new Error("Invalid archive") })'

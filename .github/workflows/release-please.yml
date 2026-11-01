@@ -2,11 +2,14 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*'
 
 name: release-please
 
 jobs:
   release-please:
+    if: ${{ github.ref == 'refs/heads/main' }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -24,14 +27,14 @@ jobs:
   build-release:
     needs: release-please
     runs-on: ubuntu-latest
-    if: ${{ needs.release-please.outputs.release_created }}
+    if: ${{ always() && (needs.release-please.outputs.release_created == 'true' || startsWith(github.ref, 'refs/tags/v')) }}
     permissions:
       contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ needs.release-please.outputs.sha }}
+          ref: ${{ needs.release-please.outputs.sha || github.sha }}
           persist-credentials: false
 
       - name: Install gettext
@@ -40,23 +43,49 @@ jobs:
       - name: Compile translations
         run: ./bin/i18n compile
 
+      - name: Run tests
+        run: node tools/test-romanization.mjs
+
+      - name: Check release version
+        env:
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name || github.ref_name }}
+        run: |
+          node -e 'const m = require("./src/metadata.json"); if (`v${m.KPlugin.Version}` !== process.env.TAG_NAME) throw new Error("Tag and widget version differ")'
+
       - name: Generate plasmoid package
         env:
-          TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name || github.ref_name }}
         run: |
           cd ./src
           zip -r "../plasmusic-toolbar-${TAG_NAME}.plasmoid" .
 
+      - name: Verify package
+        env:
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name || github.ref_name }}
+        run: |
+          unzip -t "plasmusic-toolbar-${TAG_NAME}.plasmoid"
+          unzip -p "plasmusic-toolbar-${TAG_NAME}.plasmoid" metadata.json | node -e 'let s=""; process.stdin.on("data", c => s += c); process.stdin.on("end", () => { const m = JSON.parse(s); if (m.KPlugin.Id !== "plasmusic-toolbar-fork" || `v${m.KPlugin.Version}` !== process.env.TAG_NAME) throw new Error("Invalid package metadata") })'
+
+      - name: Create draft for a pushed tag
+        if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          if ! gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            gh release create "$TAG_NAME" --verify-tag --draft --generate-notes
+          fi
+
       - name: Upload plasmoid package to release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name || github.ref_name }}
         run: |
-          gh release upload "$TAG_NAME" "./plasmusic-toolbar-${TAG_NAME}.plasmoid"
+          gh release upload "$TAG_NAME" "./plasmusic-toolbar-${TAG_NAME}.plasmoid" --clobber
 
       - name: Publish release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAG_NAME: ${{ needs.release-please.outputs.tag_name }}
+          TAG_NAME: ${{ needs.release-please.outputs.tag_name || github.ref_name }}
         run: |
           gh release edit "$TAG_NAME" --draft=false

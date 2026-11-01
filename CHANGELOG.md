@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased] — Fork additions
+## 0.2.0 — Fork additions
 
 This section tracks changes from the [jojo-chaechae/plasmusic-toolbar](https://github.com/jojo-chaechae/plasmusic-toolbar) fork, maintained independently from upstream. The entries below summarize the fork-specific features (see the git log from the `580e211` merge-base for full commit details).
 
@@ -19,7 +19,7 @@ This section tracks changes from the [jojo-chaechae/plasmusic-toolbar](https://g
   * playback slider colors derived from the album art.
 * **Playback actions** — button to copy track info to the clipboard and a configurable custom script button.
 * **One-liner install script** — `install.sh` fetches and installs/upgrades the widget from this fork and optionally restarts PlasmaShell.
-* **Package identity** — the widget installs under the distinct id `plasmusic-toolbar-fork` with its own independent versioning (`0.1.0`), so it no longer collides with an upstream `plasmusic-toolbar` install on the same machine.
+* **Package identity** — the widget installs under the distinct id `plasmusic-toolbar-fork` with its own independent versioning, so it no longer collides with an upstream `plasmusic-toolbar` install on the same machine.
 * **Lyrics romanization** — Korean, Japanese and Chinese lyrics transliterated to the latin alphabet offline, configurable per view. Revised Romanization for Korean including cross-syllable sound changes, Hanyu Pinyin with tone marks and a polyphone word list for Chinese, and Hepburn for Japanese kana with kanji left in place.
 * **No media found overhaul** — configurable "no media found" text supports multiple messages (one per line) selected in order or at random, with an optional periodic rotation interval, plus options to hide the playback control buttons in the panel and to hide the panel icon when no media is found.
 

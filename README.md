@@ -46,7 +46,7 @@ The script is detected once per song, from all of its lines together, since a si
 
 - **Korean** uses Revised Romanization, including the sound changes across syllable boundaries: 독립문 becomes `dongnimmun`, not `doklipmun`.
 - **Chinese** uses Hanyu Pinyin with tone marks. Polyphonic characters are resolved through a word list, so 长大 is `zhǎng dà` while 长发 is `cháng fà`. Syllables are separated individually, as word boundaries cannot be recovered from the text.
-- **Japanese** uses Hepburn for kana and a growing offline word dictionary for common kanji lyrics — 君の名は becomes `kimi no na wa`. Unknown kanji are left in place rather than guessed, since readings depend on the surrounding word.
+- **Japanese** uses Hepburn for kana plus offline UniDic/JMdict word readings for common kanji and inflected forms — 君の名は becomes `kimi no na wa`. Unknown kanji are left in place rather than guessed, since readings depend on the surrounding word.
 
 
 ## 📦 Installation
@@ -62,8 +62,12 @@ bash <(curl -s https://raw.githubusercontent.com/jojo-chaechae/plasmusic-toolbar
 To install from a specific branch:
 
 ```sh
-PLASMUSIC_BRANCH=v4.3.1 bash <(curl -s https://raw.githubusercontent.com/jojo-chaechae/plasmusic-toolbar/main/install.sh)
+PLASMUSIC_BRANCH=v0.2.0 bash <(curl -s https://raw.githubusercontent.com/jojo-chaechae/plasmusic-toolbar/main/install.sh)
 ```
+
+### GitHub release
+
+Download the `.plasmoid` file from this fork's [releases](https://github.com/jojo-chaechae/plasmusic-toolbar/releases), then install it with `kpackagetool6 --type Plasma/Applet --install <file>.plasmoid`. For an existing installation, use `--upgrade` instead of `--install`. Restart PlasmaShell or log out and back in to load the update.
 
 ### KDE store
 

@@ -23,8 +23,9 @@ function load(name, deps = {}) {
 
 const Hangul = load("Hangul.js")
 const Kana = load("Kana.js")
+const UniDic = load("UniDicData.js")
 const JMDict = load("JMDictData.js")
-const Kanji = load("Kanji.js", {JMDict})
+const Kanji = load("Kanji.js", {UniDic, JMDict})
 const Data = load("PinyinData.js")
 const Pinyin = load("Pinyin.js", {Data})
 const Romanize = load("Romanize.js", {Hangul, Kana, Kanji, Pinyin})
@@ -81,6 +82,12 @@ const CASES = [
     [Japanese, "僕は知らない", "boku wa shiranai"],
     [Japanese, "大丈夫だよ", "daijoubu dayo"],
     [Japanese, "世界の声", "sekai no koe"],
+    [Japanese, "空の扉に鍵", "sora no tobira ni kagi"],
+    [Japanese, "知らず知らずの内に", "shirazu shirazu no uchi ni"],
+    [Japanese, "減らした心の扉に鍵をかけたの", "herashita kokoro no tobira ni kagi o kaketano"],
+    [Japanese, "誰にも見せずに", "darenimo misezu ni"],
+    [Japanese, "この手に隠した思いが", "kono te ni kakushita omoi ga"],
+    [Japanese, "目を閉じてみれば", "me o tojite mireba"],
 
     // Chinese: polyphones resolved by the word list, everything else by the
     // per-character table.
